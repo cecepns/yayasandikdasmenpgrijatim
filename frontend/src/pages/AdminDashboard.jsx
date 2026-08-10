@@ -55,6 +55,11 @@ export default function AdminDashboard() {
     stat_sekolah: '500+',
     stat_guru: '15.000+',
     stat_siswa: '100.000+',
+    alamat_yayasan: 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+    telepon_yayasan: '(031) 870-1234 / 870-1235',
+    email_yayasan: 'yplpdmpgrijatim@gmail.com',
+    website_yayasan: 'www.yplpdm_pgrijatim.com',
+    jam_operasional: 'Senin - Jumat: 08.00 - 15.30 WIB',
     foto_ketua: null,
     current_foto: ''
   });
@@ -96,6 +101,11 @@ export default function AdminDashboard() {
         stat_sekolah: data.data.stat_sekolah || '500+',
         stat_guru: data.data.stat_guru || '15.000+',
         stat_siswa: data.data.stat_siswa || '100.000+',
+        alamat_yayasan: data.data.alamat_yayasan || 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+        telepon_yayasan: data.data.telepon_yayasan || '(031) 870-1234 / 870-1235',
+        email_yayasan: data.data.email_yayasan || 'yplpdmpgrijatim@gmail.com',
+        website_yayasan: data.data.website_yayasan || 'www.yplpdm_pgrijatim.com',
+        jam_operasional: data.data.jam_operasional || 'Senin - Jumat: 08.00 - 15.30 WIB',
         current_foto: data.data.foto_ketua || ''
       }));
     }
@@ -115,6 +125,11 @@ export default function AdminDashboard() {
     formData.append('stat_sekolah', settingsForm.stat_sekolah);
     formData.append('stat_guru', settingsForm.stat_guru);
     formData.append('stat_siswa', settingsForm.stat_siswa);
+    formData.append('alamat_yayasan', settingsForm.alamat_yayasan);
+    formData.append('telepon_yayasan', settingsForm.telepon_yayasan);
+    formData.append('email_yayasan', settingsForm.email_yayasan);
+    formData.append('website_yayasan', settingsForm.website_yayasan);
+    formData.append('jam_operasional', settingsForm.jam_operasional);
     if (settingsForm.foto_ketua) {
       formData.append('foto_ketua', settingsForm.foto_ketua);
     }
@@ -510,11 +525,11 @@ export default function AdminDashboard() {
                       <tr key={item.id} className="hover:bg-slate-50">
                         <td className="py-4 px-6 font-mono font-bold text-red-800">{item.no_resi}</td>
                         <td className="py-4 px-4">
-                          <div className="font-bold text-slate-800">{item.nama_pengaju}</div>
-                          <div className="text-xs text-slate-500">{item.lembaga_sekolah} ({item.kabupaten_kota})</div>
+                          <div className="font-bold text-slate-800">{item.nama_pengirim || item.nama_pengaju}</div>
+                          <div className="text-xs text-slate-500">{item.pengirim_surat || item.lembaga_sekolah} {item.no_hp ? `(${item.no_hp})` : ''}</div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="font-semibold text-slate-800">{item.jenis_surat}</div>
+                          <div className="font-semibold text-slate-800">No: {item.nomor_surat || '-'}</div>
                           <div className="text-xs text-slate-500">{item.perihal}</div>
                         </td>
                         <td className="py-4 px-4 text-center">
@@ -823,6 +838,72 @@ export default function AdminDashboard() {
                             placeholder="Contoh: 100.000+"
                             className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
                           />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                      <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <Phone className="w-5 h-5 text-emerald-700" />
+                        Pengaturan Kontak & Alamat Yayasan (Footer & Kontak Page)
+                      </h3>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Alamat Kantor Yayasan</label>
+                          <textarea
+                            rows={2}
+                            value={settingsForm.alamat_yayasan}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, alamat_yayasan: e.target.value })}
+                            placeholder="Tuliskan alamat lengkap kantor..."
+                            className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                          ></textarea>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Nomor Telepon / Fax</label>
+                            <input
+                              type="text"
+                              value={settingsForm.telepon_yayasan}
+                              onChange={(e) => setSettingsForm({ ...settingsForm, telepon_yayasan: e.target.value })}
+                              placeholder="Contoh: (031) 870-1234 / 870-1235"
+                              className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Email Resmi</label>
+                            <input
+                              type="email"
+                              value={settingsForm.email_yayasan}
+                              onChange={(e) => setSettingsForm({ ...settingsForm, email_yayasan: e.target.value })}
+                              placeholder="Contoh: yplpdmpgrijatim@gmail.com"
+                              className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Domain / Nama Website</label>
+                            <input
+                              type="text"
+                              value={settingsForm.website_yayasan}
+                              onChange={(e) => setSettingsForm({ ...settingsForm, website_yayasan: e.target.value })}
+                              placeholder="Contoh: www.yplpdm_pgrijatim.com"
+                              className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Jam Operasional Kantor</label>
+                            <input
+                              type="text"
+                              value={settingsForm.jam_operasional}
+                              onChange={(e) => setSettingsForm({ ...settingsForm, jam_operasional: e.target.value })}
+                              placeholder="Contoh: Senin - Jumat: 08.00 - 15.30 WIB"
+                              className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>

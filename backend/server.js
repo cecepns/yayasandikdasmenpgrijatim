@@ -376,7 +376,7 @@ app.delete('/api/berita/:id', async (req, res) => {
   res.json({ success: true, message: 'Berita berhasil dihapus' });
 });
 
-// LAYANAN PERSURATAN API
+// LAYANAN PERSURATAN API (FORM UMUM INSTANSI / LEMBAGA / PERSONAL)
 app.get('/api/persuratan', async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -387,9 +387,15 @@ app.get('/api/persuratan', async (req, res) => {
   if (pool) {
     try {
       const searchPattern = `%${search}%`;
-      const [countResult] = await pool.query('SELECT COUNT(*) as total FROM layanan_persuratan WHERE no_resi LIKE ? OR nama_pengaju LIKE ? OR lembaga_sekolah LIKE ? OR perihal LIKE ?', [searchPattern, searchPattern, searchPattern, searchPattern]);
+      const [countResult] = await pool.query(
+        'SELECT COUNT(*) as total FROM layanan_persuratan WHERE no_resi LIKE ? OR nama_pengirim LIKE ? OR pengirim_surat LIKE ? OR perihal LIKE ? OR nomor_surat LIKE ?',
+        [searchPattern, searchPattern, searchPattern, searchPattern, searchPattern]
+      );
       const total = countResult[0].total;
-      const [rows] = await pool.query('SELECT * FROM layanan_persuratan WHERE no_resi LIKE ? OR nama_pengaju LIKE ? OR lembaga_sekolah LIKE ? OR perihal LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?', [searchPattern, searchPattern, searchPattern, searchPattern, limit, offset]);
+      const [rows] = await pool.query(
+        'SELECT * FROM layanan_persuratan WHERE no_resi LIKE ? OR nama_pengirim LIKE ? OR pengirim_surat LIKE ? OR perihal LIKE ? OR nomor_surat LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?',
+        [searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, limit, offset]
+      );
 
       return res.json({
         success: true,
@@ -400,10 +406,12 @@ app.get('/api/persuratan', async (req, res) => {
   }
 
   let filtered = memoryDatabase.layanan_persuratan.filter(s =>
-    s.no_resi.toLowerCase().includes(search.toLowerCase()) ||
-    s.nama_pengaju.toLowerCase().includes(search.toLowerCase()) ||
-    s.lembaga_sekolah.toLowerCase().includes(search.toLowerCase()) ||
-    s.perihal.toLowerCase().includes(search.toLowerCase())
+    (s.no_resi && s.no_resi.toLowerCase().includes(search.toLowerCase())) ||
+    (s.nama_pengirim && s.nama_pengirim.toLowerCase().includes(search.toLowerCase())) ||
+    (s.nama_pengaju && s.nama_pengaju.toLowerCase().includes(search.toLowerCase())) ||
+    (s.pengirim_surat && s.pengirim_surat.toLowerCase().includes(search.toLowerCase())) ||
+    (s.perihal && s.perihal.toLowerCase().includes(search.toLowerCase())) ||
+    (s.nomor_surat && s.nomor_surat.toLowerCase().includes(search.toLowerCase()))
   );
   filtered.sort((a, b) => b.id - a.id);
   const total = filtered.length;
@@ -431,19 +439,36 @@ app.get('/api/persuratan/lacak/:noResi', async (req, res) => {
 });
 
 app.post('/api/persuratan', upload.single('file_lampiran'), async (req, res) => {
-  const { nama_pengaju, lembaga_sekolah, kabupaten_kota, jenis_surat, perihal, keterangan } = req.body;
+  const { email, nama_pengirim, nama_pengaju, pengirim_surat, lembaga_sekolah, no_hp, kepada, unit_kerja, nomor_surat, tanggal_surat, perihal, keterangan } = req.body;
   const file_lampiran = req.file ? `/uploads/${req.file.filename}` : null;
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const randomNum = Math.floor(1000 + Math.random() * 9000);
   const no_resi = `SRT-${dateStr}-${randomNum}`;
   const status = 'Diproses';
 
+  const senderName = nama_pengirim || nama_pengaju || 'Pengirim Surat';
+  const senderOrg = pengirim_surat || lembaga_sekolah || 'Umum';
+
   const pool = await getDbConnection();
   if (pool) {
     try {
       const [result] = await pool.query(
-        'INSERT INTO layanan_persuratan (no_resi, nama_pengaju, lembaga_sekolah, kabupaten_kota, jenis_surat, perihal, keterangan, file_lampiran, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [no_resi, nama_pengaju, lembaga_sekolah, kabupaten_kota, jenis_surat, perihal, keterangan, file_lampiran, status]
+        'INSERT INTO layanan_persuratan (no_resi, email, nama_pengirim, pengirim_surat, no_hp, kepada, unit_kerja, nomor_surat, tanggal_surat, perihal, keterangan, file_lampiran, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+          no_resi,
+          email || '',
+          senderName,
+          senderOrg,
+          no_hp || '',
+          kepada || 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
+          unit_kerja || 'Pengurus Harian Yayasan',
+          nomor_surat || '-',
+          tanggal_surat || new Date().toISOString().slice(0, 10),
+          perihal,
+          keterangan || '',
+          file_lampiran,
+          status
+        ]
       );
       return res.status(201).json({ success: true, message: 'Pengajuan surat berhasil dikirim', data: { no_resi, id: result.insertId } });
     } catch (e) { console.error(e); }
@@ -452,12 +477,18 @@ app.post('/api/persuratan', upload.single('file_lampiran'), async (req, res) => 
   const newItem = {
     id: memoryDatabase.layanan_persuratan.length + 1,
     no_resi,
-    nama_pengaju,
-    lembaga_sekolah,
-    kabupaten_kota,
-    jenis_surat,
+    email: email || '',
+    nama_pengirim: senderName,
+    nama_pengaju: senderName,
+    pengirim_surat: senderOrg,
+    lembaga_sekolah: senderOrg,
+    no_hp: no_hp || '',
+    kepada: kepada || 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
+    unit_kerja: unit_kerja || 'Pengurus Harian Yayasan',
+    nomor_surat: nomor_surat || '-',
+    tanggal_surat: tanggal_surat || new Date().toISOString().slice(0, 10),
     perihal,
-    keterangan,
+    keterangan: keterangan || '',
     file_lampiran,
     status,
     catatan_admin: null,
@@ -765,7 +796,12 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`,
   stat_kabupaten: '38',
   stat_sekolah: '500+',
   stat_guru: '15.000+',
-  stat_siswa: '100.000+'
+  stat_siswa: '100.000+',
+  alamat_yayasan: 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+  telepon_yayasan: '(031) 870-1234 / 870-1235',
+  email_yayasan: 'yplpdmpgrijatim@gmail.com',
+  website_yayasan: 'www.yplpdm_pgrijatim.com',
+  jam_operasional: 'Senin - Jumat: 08.00 - 15.30 WIB'
 };
 
 // SETTINGS API (Dynamic Profil Yayasan & Ketua Info)
@@ -783,7 +819,11 @@ app.get('/api/settings', async (req, res) => {
 });
 
 app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
-  const { nama_ketua, jabatan_ketua, sambutan_ketua, sejarah_yayasan, visi_yayasan, misi_yayasan, stat_kabupaten, stat_sekolah, stat_guru, stat_siswa } = req.body;
+  const {
+    nama_ketua, jabatan_ketua, sambutan_ketua, sejarah_yayasan, visi_yayasan, misi_yayasan,
+    stat_kabupaten, stat_sekolah, stat_guru, stat_siswa,
+    alamat_yayasan, telepon_yayasan, email_yayasan, website_yayasan, jam_operasional
+  } = req.body;
   let foto_ketua = req.file ? `/uploads/${req.file.filename}` : undefined;
 
   const pool = await getDbConnection();
@@ -799,12 +839,17 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
       if (stat_sekolah) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_sekolah', stat_sekolah, stat_sekolah]);
       if (stat_guru) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_guru', stat_guru, stat_guru]);
       if (stat_siswa) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_siswa', stat_siswa, stat_siswa]);
+      if (alamat_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['alamat_yayasan', alamat_yayasan, alamat_yayasan]);
+      if (telepon_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['telepon_yayasan', telepon_yayasan, telepon_yayasan]);
+      if (email_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['email_yayasan', email_yayasan, email_yayasan]);
+      if (website_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['website_yayasan', website_yayasan, website_yayasan]);
+      if (jam_operasional) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['jam_operasional', jam_operasional, jam_operasional]);
       if (foto_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['foto_ketua', foto_ketua, foto_ketua]);
 
       const [rows] = await pool.query('SELECT * FROM settings');
       const settingsObj = {};
       rows.forEach(r => { settingsObj[r.key] = r.value; });
-      return res.json({ success: true, message: 'Pengaturan Profil Yayasan berhasil diperbarui', data: settingsObj });
+      return res.json({ success: true, message: 'Pengaturan Profil & Kontak Yayasan berhasil diperbarui', data: settingsObj });
     } catch (e) { console.error(e); }
   }
 
@@ -818,9 +863,14 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
   if (stat_sekolah) memoryDatabase.settings.stat_sekolah = stat_sekolah;
   if (stat_guru) memoryDatabase.settings.stat_guru = stat_guru;
   if (stat_siswa) memoryDatabase.settings.stat_siswa = stat_siswa;
+  if (alamat_yayasan) memoryDatabase.settings.alamat_yayasan = alamat_yayasan;
+  if (telepon_yayasan) memoryDatabase.settings.telepon_yayasan = telepon_yayasan;
+  if (email_yayasan) memoryDatabase.settings.email_yayasan = email_yayasan;
+  if (website_yayasan) memoryDatabase.settings.website_yayasan = website_yayasan;
+  if (jam_operasional) memoryDatabase.settings.jam_operasional = jam_operasional;
   if (foto_ketua) memoryDatabase.settings.foto_ketua = foto_ketua;
 
-  res.json({ success: true, message: 'Pengaturan Profil Yayasan berhasil diperbarui', data: memoryDatabase.settings });
+  res.json({ success: true, message: 'Pengaturan Profil & Kontak Yayasan berhasil diperbarui', data: memoryDatabase.settings });
 });
 
 app.listen(PORT, () => {

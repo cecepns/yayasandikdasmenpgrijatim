@@ -1,8 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Globe, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, ArrowUpRight } from 'lucide-react';
+import { api } from '../utils/api';
+import { API_ENDPOINTS } from '../utils/endpoints';
+import { requestHandler } from '../utils/request';
 
 export default function Footer() {
+  const [contactInfo, setContactInfo] = useState({
+    alamat_yayasan: 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+    telepon_yayasan: '(031) 870-1234 / 870-1235',
+    email_yayasan: 'yplpdmpgrijatim@gmail.com',
+    website_yayasan: 'www.yplpdm_pgrijatim.com'
+  });
+
+  useEffect(() => {
+    const fetchContactSettings = async () => {
+      const { data, error } = await requestHandler(() => api.get(API_ENDPOINTS.SETTINGS.GET));
+      if (!error && data?.data) {
+        setContactInfo({
+          alamat_yayasan: data.data.alamat_yayasan || 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+          telepon_yayasan: data.data.telepon_yayasan || '(031) 870-1234 / 870-1235',
+          email_yayasan: data.data.email_yayasan || 'yplpdmpgrijatim@gmail.com',
+          website_yayasan: data.data.website_yayasan || 'www.yplpdm_pgrijatim.com'
+        });
+      }
+    };
+    fetchContactSettings();
+  }, []);
+
   return (
     <footer className="bg-gray-900 text-gray-300 pt-16 pb-12 border-t-4 border-red-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,7 +115,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Col 4: Contact Info */}
+          {/* Col 4: Dynamic Contact Info */}
           <div>
             <h3 className="text-white font-semibold text-base mb-4 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -99,19 +124,19 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                <span>Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296</span>
+                <span>{contactInfo.alamat_yayasan}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-emerald-500 shrink-0" />
-                <span>(031) 828-4455 / 828-4456</span>
+                <span>{contactInfo.telepon_yayasan}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-blue-500 shrink-0" />
-                <span>yplpdmpgrijatim@gmail.com</span>
+                <span>{contactInfo.email_yayasan}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Globe className="w-5 h-5 text-yellow-500 shrink-0" />
-                <span>www.yplpdm_pgrijatim.com</span>
+                <span>{contactInfo.website_yayasan}</span>
               </li>
             </ul>
           </div>

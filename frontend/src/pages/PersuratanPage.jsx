@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Search, Send, CheckCircle, Clock, AlertCircle, Upload, ShieldCheck, HelpCircle } from 'lucide-react';
+import { FileText, Search, Send, CheckCircle, Clock, AlertCircle, Upload, ShieldCheck, Mail, User, Phone, Building2, Calendar, Hash, FileCheck } from 'lucide-react';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
@@ -10,12 +10,16 @@ export default function PersuratanPage() {
   const [activeTab, setActiveTab] = useState('pengajuan'); // 'pengajuan' | 'lacak'
   const [loading, setLoading] = useState(false);
 
-  // Form Pengajuan
+  // Form Pengajuan Surat General / Umum
   const [formData, setFormData] = useState({
-    nama_pengaju: '',
-    lembaga_sekolah: '',
-    kabupaten_kota: 'Kota Surabaya',
-    jenis_surat: 'Surat Rekomendasi Yayasan',
+    email: '',
+    nama_pengirim: '',
+    pengirim_surat: 'Sekolah / Lembaga PGRI',
+    no_hp: '',
+    kepada: 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
+    unit_kerja: 'Pengurus Harian Yayasan',
+    nomor_surat: '',
+    tanggal_surat: new Date().toISOString().slice(0, 10),
     perihal: '',
     keterangan: '',
     file_lampiran: null
@@ -36,22 +40,35 @@ export default function PersuratanPage() {
   };
 
   const handleFileChange = (e) => {
-    setFormData(prev => ({ ...prev, file_lampiran: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file && file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran berkas maksimal 10 MB');
+      return;
+    }
+    setFormData(prev => ({ ...prev, file_lampiran: file }));
   };
 
   const handleSubmitPengajuan = async (e) => {
     e.preventDefault();
-    if (!formData.nama_pengaju || !formData.lembaga_sekolah || !formData.perihal) {
-      toast.error('Mohon lengkapi formulir pengajuan surat');
+    if (!formData.email || !formData.nama_pengirim || !formData.nomor_surat || !formData.perihal) {
+      toast.error('Mohon isi semua bidang formulir wajib (*)');
+      return;
+    }
+    if (!formData.file_lampiran) {
+      toast.error('Mohon unggah berkas file surat (PDF / Gambar)');
       return;
     }
 
     setLoading(true);
     const data = new FormData();
-    data.append('nama_pengaju', formData.nama_pengaju);
-    data.append('lembaga_sekolah', formData.lembaga_sekolah);
-    data.append('kabupaten_kota', formData.kabupaten_kota);
-    data.append('jenis_surat', formData.jenis_surat);
+    data.append('email', formData.email);
+    data.append('nama_pengirim', formData.nama_pengirim);
+    data.append('pengirim_surat', formData.pengirim_surat);
+    data.append('no_hp', formData.no_hp);
+    data.append('kepada', formData.kepada);
+    data.append('unit_kerja', formData.unit_kerja);
+    data.append('nomor_surat', formData.nomor_surat);
+    data.append('tanggal_surat', formData.tanggal_surat);
     data.append('perihal', formData.perihal);
     data.append('keterangan', formData.keterangan);
     if (formData.file_lampiran) {
@@ -68,15 +85,19 @@ export default function PersuratanPage() {
     if (error) {
       toast.error(error);
     } else {
-      toast.success(`Pengajuan Surat Berhasil! Nomor Resi Anda: ${resData.data.no_resi}`);
+      toast.success(`Pengajuan Surat Berhasil! Nomor Resi: ${resData.data.no_resi}`);
       setSearchResi(resData.data.no_resi);
       setActiveTab('lacak');
       handleLacakResi(resData.data.no_resi);
       setFormData({
-        nama_pengaju: '',
-        lembaga_sekolah: '',
-        kabupaten_kota: 'Kota Surabaya',
-        jenis_surat: 'Surat Rekomendasi Yayasan',
+        email: '',
+        nama_pengirim: '',
+        pengirim_surat: 'Sekolah / Lembaga PGRI',
+        no_hp: '',
+        kepada: 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
+        unit_kerja: 'Pengurus Harian Yayasan',
+        nomor_surat: '',
+        tanggal_surat: new Date().toISOString().slice(0, 10),
         perihal: '',
         keterangan: '',
         file_lampiran: null
@@ -102,48 +123,48 @@ export default function PersuratanPage() {
       toast.error('Nomor resi tidak ditemukan');
     } else {
       setLacakResult(data.data);
-      toast.success('Status resi berhasil ditemukan');
+      toast.success('Status resi surat ditemukan');
     }
   };
 
   return (
-    <div className="bg-white py-12 lg:py-20 text-slate-800">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <div className="bg-slate-100 min-h-screen py-10 lg:py-16 text-slate-800">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
-        {/* Title Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3" data-aos="fade-up">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider border border-red-100">
-            <FileText className="w-4 h-4 text-red-600" />
-            Layanan Layanan Persuratan Online
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Pelayanan E-Surat Resmi Yayasan Dikdasmen PGRI Jatim
+        {/* Title Header Card */}
+        <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white rounded-3xl p-8 shadow-xl text-center space-y-3" data-aos="fade-up">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/20 text-yellow-300 text-xs font-bold uppercase tracking-wider border border-white/20">
+            <FileText className="w-4 h-4 text-yellow-300" />
+            Layanan Persuratan Resmi
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+            Layanan Persuratan Yayasan Dikdasmen PGRI Jatim
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base">
-            Pengajuan rekomendasi, permohonan mutasi, izin operasional, serta lacak status pengajuan surat secara transparan.
+          <p className="text-emerald-100 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+            Formulir penerimaan & pengajuan surat resmi bagi Instansi Pemerintah, Dinas Pendidikan, Sekolah/Lembaga Swasta, Perusahaan, Organisasi, maupun Umum.
           </p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex justify-center border-b border-slate-200">
+        <div className="flex justify-center bg-white p-2 rounded-2xl shadow-xs border border-slate-200">
           <button
             onClick={() => setActiveTab('pengajuan')}
-            className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm border-b-2 transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
               activeTab === 'pengajuan'
-                ? 'border-red-700 text-red-700'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'bg-emerald-800 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
             <Send className="w-4 h-4" />
-            <span>Form Pengajuan Surat</span>
+            <span>Form Pengisian Surat</span>
           </button>
 
           <button
             onClick={() => setActiveTab('lacak')}
-            className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm border-b-2 transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
               activeTab === 'lacak'
-                ? 'border-red-700 text-red-700'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'bg-emerald-800 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
             <Search className="w-4 h-4" />
@@ -151,128 +172,235 @@ export default function PersuratanPage() {
           </button>
         </div>
 
-        {/* TAB 1: FORM PENGAJUAN SURAT */}
+        {/* TAB 1: FORM PENGISIAN SURAT UMUM */}
         {activeTab === 'pengajuan' && (
-          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-sm" data-aos="fade-up">
-            <form onSubmit={handleSubmitPengajuan} className="space-y-6">
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Nama Pemohon / Kepala Sekolah *
-                  </label>
-                  <input
-                    type="text"
-                    name="nama_pengaju"
-                    value={formData.nama_pengaju}
-                    onChange={handleInputChange}
-                    placeholder="Contoh: Drs. Supriyanto, M.Pd"
-                    required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
-                  />
-                </div>
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-lg space-y-6" data-aos="fade-up">
+            <div className="border-b border-slate-100 pb-4">
+              <h2 className="text-xl font-extrabold text-slate-900">Formulir Pengajuan / Penerimaan Surat</h2>
+              <p className="text-xs text-red-600 font-semibold mt-1">* Menunjukkan pertanyaan yang wajib diisi</p>
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Lembaga / Sekolah PGRI *
-                  </label>
+            <form onSubmit={handleSubmitPengajuan} className="space-y-6">
+
+              {/* 1. Email */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  Email <span className="text-red-600">*</span>
+                </label>
+                <div className="relative">
+                  <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
                   <input
-                    type="text"
-                    name="lembaga_sekolah"
-                    value={formData.lembaga_sekolah}
+                    type="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="Contoh: SMA PGRI 1 Surabaya"
+                    placeholder="nama.email@domain.com"
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Kabupaten / Kota Perwakilan *
-                  </label>
+              {/* 2. Nama Pengirim */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  Nama Pengirim <span className="text-red-600">*</span>
+                </label>
+                <div className="relative">
+                  <User className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
                   <input
                     type="text"
-                    name="kabupaten_kota"
-                    value={formData.kabupaten_kota}
+                    name="nama_pengirim"
+                    value={formData.nama_pengirim}
                     onChange={handleInputChange}
-                    placeholder="Contoh: Kota Surabaya / Kab. Sidoarjo"
+                    placeholder="Tuliskan nama lengkap pengirim..."
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Jenis Surat *
-                  </label>
+              {/* 3. Pengirim Surat (Kategori Instansi/Lembaga) */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  Pengirim Surat / Instansi / Kategori <span className="text-red-600">*</span>
+                </label>
+                <div className="relative">
+                  <Building2 className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
                   <select
-                    name="jenis_surat"
-                    value={formData.jenis_surat}
+                    name="pengirim_surat"
+                    value={formData.pengirim_surat}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
                   >
-                    <option value="Surat Rekomendasi Yayasan">Surat Rekomendasi Yayasan</option>
-                    <option value="Surat Pengantar Dinas">Surat Pengantar Dinas</option>
-                    <option value="Surat Keterangan Lembaga">Surat Keterangan Lembaga</option>
-                    <option value="Permohonan Mutasi Guru/KS">Permohonan Mutasi Guru/KS</option>
-                    <option value="Perpanjangan Izin Operasional">Perpanjangan Izin Operasional</option>
+                    <option value="Sekolah / Lembaga PGRI">Sekolah / Lembaga Swasta PGRI</option>
+                    <option value="Dinas Pendidikan / Pemerintah">Dinas Pendidikan / Instansi Pemerintah</option>
+                    <option value="Perusahaan / Swasta">Perusahaan / Badan Swasta</option>
+                    <option value="Organisasi Masyarakat">Organisasi / Yayasan Lain</option>
+                    <option value="Umum / Perorangan">Umum / Perorangan</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Perihal Surat *
+              {/* 4. No HP / WhatsApp */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  No HP / WhatsApp <span className="text-red-600">*</span>
+                </label>
+                <div className="relative">
+                  <Phone className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="text"
+                    name="no_hp"
+                    value={formData.no_hp}
+                    onChange={handleInputChange}
+                    placeholder="Contoh: 081234567890"
+                    required
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* 5. Kepada & 6. Unit Kerja Tujuan */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                  <label className="block text-sm font-bold text-slate-900">
+                    Kepada (Tujuan Surat)
+                  </label>
+                  <input
+                    type="text"
+                    name="kepada"
+                    value={formData.kepada}
+                    onChange={handleInputChange}
+                    placeholder="Contoh: Ketua Yayasan Dikdasmen PGRI Jatim"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
+                  />
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                  <label className="block text-sm font-bold text-slate-900">
+                    Unit Kerja / Bidang Tujuan <span className="text-red-600">*</span>
+                  </label>
+                  <select
+                    name="unit_kerja"
+                    value={formData.unit_kerja}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
+                  >
+                    <option value="Pengurus Harian Yayasan">Pengurus Harian Yayasan</option>
+                    <option value="Sekretariat & Persuratan">Sekretariat & Persuratan</option>
+                    <option value="Bidang Pendidikan">Bidang Pendidikan</option>
+                    <option value="Bidang Keuangan & Aset">Bidang Keuangan & Aset</option>
+                    <option value="Umum & Humas">Umum & Humas</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 7. Nomor Surat & 8. Tanggal Surat */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                  <label className="block text-sm font-bold text-slate-900">
+                    Nomor Surat <span className="text-red-600">*</span>
+                  </label>
+                  <div className="relative">
+                    <Hash className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                    <input
+                      type="text"
+                      name="nomor_surat"
+                      value={formData.nomor_surat}
+                      onChange={handleInputChange}
+                      placeholder="Contoh: 045/YPLP-PGRI/VIII/2026"
+                      required
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                  <label className="block text-sm font-bold text-slate-900">
+                    Tanggal Surat <span className="text-red-600">*</span>
+                  </label>
+                  <div className="relative">
+                    <Calendar className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
+                    <input
+                      type="date"
+                      name="tanggal_surat"
+                      value={formData.tanggal_surat}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 9. Perihal Surat */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  Perihal Surat <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
                   name="perihal"
                   value={formData.perihal}
                   onChange={handleInputChange}
-                  placeholder="Contoh: Pengajuan Rekomendasi Perpanjangan Akreditasi Sekolah"
+                  placeholder="Tuliskan perihal / subjek surat..."
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Keterangan Tambahan / Detail
+              {/* Detail / Catatan Keterangan */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  Ringkasan Isi / Catatan Pengirim (Opsional)
                 </label>
                 <textarea
                   name="keterangan"
-                  rows={4}
+                  rows={3}
                   value={formData.keterangan}
                   onChange={handleInputChange}
-                  placeholder="Tuliskan rincian permohonan surat..."
-                  className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
+                  placeholder="Tuliskan rincian pesan atau catatan singkat..."
+                  className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
                 ></textarea>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Lampiran Berkas / Surat Pendukung (PDF/Docx/Gambar)
+              {/* 10. Upload File Surat */}
+              <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-2">
+                <label className="block text-sm font-bold text-slate-900">
+                  Silakan Upload File Surat <span className="text-red-600">*</span>
                 </label>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer border border-slate-300 rounded-xl p-1 bg-white"
-                />
+                <p className="text-xs text-slate-500">Upload 1 file yang didukung: PDF atau Image. Maksimal 10 MB.</p>
+                
+                <div className="pt-2">
+                  <input
+                    type="file"
+                    accept=".pdf,image/*"
+                    onChange={handleFileChange}
+                    required
+                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer border border-slate-300 rounded-xl p-1 bg-white"
+                  />
+                </div>
               </div>
 
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-700/20 disabled:opacity-50 transition-all"
-                >
-                  <Send className="w-5 h-5" />
-                  <span>{loading ? 'Mengirim Pengajuan...' : 'Kirim Pengajuan Surat'}</span>
-                </button>
+              {/* Disclaimer Note */}
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-950 leading-relaxed space-y-1">
+                <span className="font-bold block text-emerald-900 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-700" /> Disclamer Pengiriman Berkas
+                </span>
+                <p>
+                  Setiap dokumen yang dikirim melalui aplikasi ini merupakan dokumen resmi yang akan diverifikasi oleh Sekretariat Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur.
+                </p>
               </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 py-4 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-base rounded-2xl shadow-lg shadow-emerald-800/20 disabled:opacity-50 transition-all"
+              >
+                <Send className="w-5 h-5" />
+                <span>{loading ? 'Mengirim Surat...' : 'Kirim Surat Resmi'}</span>
+              </button>
 
             </form>
           </div>
@@ -283,7 +411,7 @@ export default function PersuratanPage() {
           <div className="space-y-8" data-aos="fade-up">
             
             {/* Search Input Box */}
-            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
@@ -291,17 +419,17 @@ export default function PersuratanPage() {
                     type="text"
                     value={searchResi}
                     onChange={(e) => setSearchResi(e.target.value)}
-                    placeholder="Masukkan Nomor Resi (Contoh: SRT-20260810-001)"
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
+                    placeholder="Masukkan Nomor Resi (Contoh: SRT-20260810-1234)"
+                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white text-sm"
                   />
                 </div>
                 <button
                   onClick={() => handleLacakResi()}
                   disabled={searching}
-                  className="px-6 py-3 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm rounded-xl shadow-md disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   <Search className="w-4 h-4" />
-                  <span>{searching ? 'Mencari...' : 'Lacak Resi'}</span>
+                  <span>{searching ? 'Mencari...' : 'Lacak Status Resi'}</span>
                 </button>
               </div>
             </div>
@@ -314,7 +442,7 @@ export default function PersuratanPage() {
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                       Nomor Resi Surat
                     </span>
-                    <h3 className="text-xl font-extrabold text-red-800">{lacakResult.no_resi}</h3>
+                    <h3 className="text-xl font-extrabold text-emerald-900">{lacakResult.no_resi}</h3>
                   </div>
 
                   {/* Status Badge */}
@@ -342,29 +470,35 @@ export default function PersuratanPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
                   <div>
-                    <span className="text-xs text-slate-500 font-semibold uppercase">Nama Pemohon:</span>
-                    <p className="font-bold text-slate-800">{lacakResult.nama_pengaju}</p>
+                    <span className="text-xs text-slate-500 font-semibold uppercase">Nama Pengirim:</span>
+                    <p className="font-bold text-slate-800">{lacakResult.nama_pengirim || lacakResult.nama_pengaju}</p>
+                    <p className="text-xs text-slate-500">{lacakResult.email}</p>
                   </div>
 
                   <div>
-                    <span className="text-xs text-slate-500 font-semibold uppercase">Lembaga Sekolah:</span>
-                    <p className="font-bold text-slate-800">{lacakResult.lembaga_sekolah} ({lacakResult.kabupaten_kota})</p>
+                    <span className="text-xs text-slate-500 font-semibold uppercase">Pengirim Surat / Instansi:</span>
+                    <p className="font-bold text-slate-800">{lacakResult.pengirim_surat || lacakResult.lembaga_sekolah}</p>
                   </div>
 
                   <div>
-                    <span className="text-xs text-slate-500 font-semibold uppercase">Jenis & Perihal:</span>
-                    <p className="font-bold text-slate-800">{lacakResult.jenis_surat} - {lacakResult.perihal}</p>
+                    <span className="text-xs text-slate-500 font-semibold uppercase">Nomor & Tanggal Surat:</span>
+                    <p className="font-bold text-slate-800">{lacakResult.nomor_surat || '-'} ({lacakResult.tanggal_surat || 'Hari ini'})</p>
                   </div>
 
                   <div>
-                    <span className="text-xs text-slate-500 font-semibold uppercase">Tanggal Pengajuan:</span>
-                    <p className="font-bold text-slate-800">{lacakResult.tanggal_pengajuan || 'Terbaru'}</p>
+                    <span className="text-xs text-slate-500 font-semibold uppercase">Tujuan Unit Kerja:</span>
+                    <p className="font-bold text-slate-800">{lacakResult.unit_kerja || 'Pengurus Harian'}</p>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <span className="text-xs text-slate-500 font-semibold uppercase">Perihal Surat:</span>
+                    <p className="font-bold text-slate-800">{lacakResult.perihal}</p>
                   </div>
                 </div>
 
                 {lacakResult.catatan_admin && (
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs sm:text-sm">
-                    <span className="font-bold text-slate-800 block mb-1">Catatan Pengurus Yayasan:</span>
+                    <span className="font-bold text-slate-800 block mb-1">Catatan Sekretariat Yayasan:</span>
                     <p className="text-slate-600 italic">{lacakResult.catatan_admin}</p>
                   </div>
                 )}

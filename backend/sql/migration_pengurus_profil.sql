@@ -36,5 +36,10 @@ INSERT INTO `settings` (`key`, `value`) VALUES
 ('stat_kabupaten', '38'),
 ('stat_sekolah', '500+'),
 ('stat_guru', '15.000+'),
-('stat_siswa', '100.000+')
+('stat_siswa', '100.000+'),
+('alamat_yayasan', 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296'),
+('telepon_yayasan', '(031) 870-1234 / 870-1235'),
+('email_yayasan', 'yplpdmpgrijatim@gmail.com'),
+('website_yayasan', 'www.yplpdm_pgrijatim.com'),
+('jam_operasional', 'Senin - Jumat: 08.00 - 15.30 WIB')
 ON DUPLICATE KEY UPDATE `key`=`key`;

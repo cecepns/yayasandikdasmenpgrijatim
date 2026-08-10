@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, Globe, Send, MessageSquare } from 'lucide-react';
+import { api } from '../utils/api';
+import { API_ENDPOINTS } from '../utils/endpoints';
+import { requestHandler } from '../utils/request';
 import toast from 'react-hot-toast';
 import AOS from 'aos';
 
 export default function KontakPage() {
+  const [contactInfo, setContactInfo] = useState({
+    alamat_yayasan: 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+    telepon_yayasan: '(031) 870-1234 / 870-1235',
+    email_yayasan: 'yplpdmpgrijatim@gmail.com',
+    website_yayasan: 'www.yplpdm_pgrijatim.com',
+    jam_operasional: 'Senin - Jumat: 08.00 - 15.30 WIB'
+  });
+
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
@@ -14,7 +25,21 @@ export default function KontakPage() {
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
+    fetchContactSettings();
   }, []);
+
+  const fetchContactSettings = async () => {
+    const { data, error } = await requestHandler(() => api.get(API_ENDPOINTS.SETTINGS.GET));
+    if (!error && data?.data) {
+      setContactInfo({
+        alamat_yayasan: data.data.alamat_yayasan || 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296',
+        telepon_yayasan: data.data.telepon_yayasan || '(031) 870-1234 / 870-1235',
+        email_yayasan: data.data.email_yayasan || 'yplpdmpgrijatim@gmail.com',
+        website_yayasan: data.data.website_yayasan || 'www.yplpdm_pgrijatim.com',
+        jam_operasional: data.data.jam_operasional || 'Senin - Jumat: 08.00 - 15.30 WIB'
+      });
+    }
+  };
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -50,7 +75,7 @@ export default function KontakPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10" data-aos="fade-up">
           
-          {/* Contact Info Sidebar */}
+          {/* Dynamic Contact Info Sidebar */}
           <div className="lg:col-span-5 bg-slate-900 text-white rounded-3xl p-8 space-y-8 flex flex-col justify-between shadow-xl">
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white">Sekretariat Yayasan</h2>
@@ -63,15 +88,15 @@ export default function KontakPage() {
                   <MapPin className="w-5 h-5 text-red-500 shrink-0 mt-1" />
                   <div>
                     <span className="font-bold text-white block">Alamat Kantor:</span>
-                    <span>Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296</span>
+                    <span>{contactInfo.alamat_yayasan}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <Phone className="w-5 h-5 text-emerald-400 shrink-0" />
                   <div>
-                    <span className="font-bold text-white block">Telepon:</span>
-                    <span>(031) 828-4455 / 828-4456</span>
+                    <span className="font-bold text-white block">Telepon / Fax:</span>
+                    <span>{contactInfo.telepon_yayasan}</span>
                   </div>
                 </div>
 
@@ -79,7 +104,7 @@ export default function KontakPage() {
                   <Mail className="w-5 h-5 text-blue-400 shrink-0" />
                   <div>
                     <span className="font-bold text-white block">Email Resmi:</span>
-                    <span>yplpdmpgrijatim@gmail.com</span>
+                    <span>{contactInfo.email_yayasan}</span>
                   </div>
                 </div>
 
@@ -87,14 +112,14 @@ export default function KontakPage() {
                   <Globe className="w-5 h-5 text-yellow-400 shrink-0" />
                   <div>
                     <span className="font-bold text-white block">Website Domain:</span>
-                    <span>www.yplpdm_pgrijatim.com</span>
+                    <span>{contactInfo.website_yayasan}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700 text-xs text-yellow-300 font-semibold">
-              Jam Kerja Sekretariat: Senin - Jumat (08.00 - 16.00 WIB)
+              Jam Kerja Sekretariat: {contactInfo.jam_operasional}
             </div>
           </div>
 

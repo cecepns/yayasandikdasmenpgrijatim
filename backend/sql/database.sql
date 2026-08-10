@@ -37,14 +37,18 @@ INSERT INTO `berita` (`id`, `judul`, `slug`, `kategori`, `konten`, `gambar`, `pe
 (3, 'Sistem Informasi Lembaga (SIL) Dan Layanan E-Surat Resmi Diluncurkan', 'sistem-informasi-lembaga-resmi-diluncurkan', 'Pengumuman', 'Yayasan Dikdasmen PGRI Jawa Timur meluncurkan portal Sistem Informasi Lembaga dan Layanan Persuratan Online guna mempermudah koordinasi antar sekolah dan pengurus daerah.', NULL, 'Admin Dikdasmen PGRI', '2026-08-09')
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
--- 3. Table layanan_persuratan
+-- 3. Table layanan_persuratan (Form Surat Umum)
 CREATE TABLE IF NOT EXISTS `layanan_persuratan` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `no_resi` VARCHAR(50) NOT NULL UNIQUE,
-  `nama_pengaju` VARCHAR(100) NOT NULL,
-  `lembaga_sekolah` VARCHAR(150) NOT NULL,
-  `kabupaten_kota` VARCHAR(100) NOT NULL,
-  `jenis_surat` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) DEFAULT NULL,
+  `nama_pengirim` VARCHAR(100) NOT NULL,
+  `pengirim_surat` VARCHAR(150) NOT NULL,
+  `no_hp` VARCHAR(50) DEFAULT NULL,
+  `kepada` VARCHAR(150) DEFAULT 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
+  `unit_kerja` VARCHAR(100) DEFAULT 'Pengurus Harian Yayasan',
+  `nomor_surat` VARCHAR(100) DEFAULT NULL,
+  `tanggal_surat` DATE DEFAULT NULL,
   `perihal` VARCHAR(255) NOT NULL,
   `keterangan` TEXT DEFAULT NULL,
   `file_lampiran` VARCHAR(255) DEFAULT NULL,
@@ -53,9 +57,9 @@ CREATE TABLE IF NOT EXISTS `layanan_persuratan` (
   `tanggal_pengajuan` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO `layanan_persuratan` (`id`, `no_resi`, `nama_pengaju`, `lembaga_sekolah`, `kabupaten_kota`, `jenis_surat`, `perihal`, `keterangan`, `status`) VALUES
-(1, 'SRT-20260810-001', 'Drs. Supriyanto, M.Pd', 'SMA PGRI 1 Surabaya', 'Kota Surabaya', 'Surat Rekomendasi', 'Pengajuan Akreditasi Sekolah Tahun 2026', 'Memohon rekomendasi yayasan untuk perpanjangan izin operasional & akreditasi.', 'Disetujui'),
-(2, 'SRT-20260810-002', 'Budi Santoso, S.Pd', 'SMP PGRI 2 Malang', 'Kota Malang', 'Surat Pengantar', 'Permohonan Mutasi Kepala Sekolah', 'Surat pengantar permohonan ke Dinas Pendidikan.', 'Diproses')
+INSERT INTO `layanan_persuratan` (`id`, `no_resi`, `email`, `nama_pengirim`, `pengirim_surat`, `no_hp`, `kepada`, `unit_kerja`, `nomor_surat`, `tanggal_surat`, `perihal`, `keterangan`, `status`) VALUES
+(1, 'SRT-20260810-001', 'supriyanto@gmail.com', 'Drs. Supriyanto, M.Pd', 'SMA PGRI 1 Surabaya', '081234567890', 'Ketua Yayasan Dikdasmen PGRI Jawa Timur', 'Pengurus Harian Yayasan', '045/SMA-PGRI1/VIII/2026', '2026-08-01', 'Pengajuan Akreditasi Sekolah Tahun 2026', 'Memohon rekomendasi yayasan untuk perpanjangan izin operasional & akreditasi.', 'Disetujui'),
+(2, 'SRT-20260810-002', 'budi.santoso@gmail.com', 'Budi Santoso, S.Pd', 'Dinas Pendidikan Kota Malang', '085678901234', 'Ketua Yayasan Dikdasmen PGRI Jawa Timur', 'Bidang Pendidikan', '800/123/Dindik/2026', '2026-08-05', 'Permohonan Koordinasi Mutasi Kepala Sekolah', 'Surat pengantar permohonan koordinasi ke Dinas Pendidikan.', 'Diproses')
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- 4. Table sistem_informasi_lembaga (Data Sekolah PGRI Jatim)
@@ -99,6 +103,11 @@ INSERT INTO `settings` (`key`, `value`) VALUES
 ('stat_sekolah', '500+'),
 ('stat_guru', '15.000+'),
 ('stat_siswa', '100.000+'),
+('alamat_yayasan', 'Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296'),
+('telepon_yayasan', '(031) 870-1234 / 870-1235'),
+('email_yayasan', 'yplpdmpgrijatim@gmail.com'),
+('website_yayasan', 'www.yplpdm_pgrijatim.com'),
+('jam_operasional', 'Senin - Jumat: 08.00 - 15.30 WIB'),
 ('sambutan_ketua', 'Assalamu\'alaikum Warahmatullahi Wabarakatuh.\nSalam sejahtera untuk kita semua.\n\nPuji syukur ke hadirat Allah SWT atas segala rahmat dan karunia-Nya, sehingga Website Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah (Dikdasmen) PGRI Jawa Timur dapat hadir sebagai media informasi, komunikasi, dan kolaborasi bagi seluruh keluarga besar PGRI serta masyarakat luas.\n\nSelamat datang di website resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur.\n\nKami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Oleh karena itu, Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, mendukung profesionalisme tenaga pendidik dan kependidikan, serta mendorong lahirnya generasi yang cerdas, berakhlak mulia, kreatif, dan berdaya saing.\n\nWebsite ini kami hadirkan sebagai wujud keterbukaan informasi sekaligus sarana untuk mempererat sinergi antara yayasan, sekolah, guru, tenaga kependidikan, orang tua, alumni, pemerintah, dan seluruh pemangku kepentingan. Melalui media ini, kami berharap masyarakat dapat memperoleh informasi yang akurat mengenai program, kegiatan, prestasi, serta berbagai inovasi yang dikembangkan oleh Yayasan Dikdasmen PGRI Jawa Timur.\n\nKami mengajak seluruh keluarga besar Lembaga Pendidikan PGRI Jawa Timur untuk terus menjaga semangat kebersamaan, profesionalisme, dan pengabdian dalam memajukan pendidikan. Dengan kolaborasi yang kuat, insya Allah kita dapat memberikan kontribusi nyata dalam mencerdaskan kehidupan bangsa serta mewujudkan pendidikan yang berkualitas, inklusif, dan berkelanjutan. Semangat kolaborasi dan pemanfaatan teknologi digital juga menjadi bagian penting dalam meningkatkan layanan dan transparansi lembaga pendidikan.\n\nAkhir kata, kami mengucapkan terima kasih kepada seluruh pihak yang telah memberikan dukungan dan kepercayaan kepada Yayasan Dikdasmen PGRI Jawa Timur. Semoga Allah SWT senantiasa memberikan petunjuk, kekuatan, dan keberkahan kepada kita semua dalam mengemban amanah mencerdaskan generasi penerus bangsa.\n\nWassalamu\'alaikum Warahmatullahi Wabarakatuh.')
 ON DUPLICATE KEY UPDATE `key`=`key`;
 
