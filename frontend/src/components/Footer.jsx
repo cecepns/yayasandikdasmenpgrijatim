@@ -99,7 +99,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                <span>Gedung Guru PGRI Jawa Timur, Jl. Ahmad Yani No. 2-4, Surabaya, Jawa Timur</span>
+                <span>Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-emerald-500 shrink-0" />
@@ -107,11 +107,11 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-blue-500 shrink-0" />
-                <span>sekretariat@yayasandikdasmenpgrijatim.com</span>
+                <span>yplpdmpgrijatim@gmail.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <Globe className="w-5 h-5 text-yellow-500 shrink-0" />
-                <span>www.yayasandikdasmenpgrijatim.com</span>
+                <span>www.yplpdm_pgrijatim.com</span>
               </li>
             </ul>
           </div>

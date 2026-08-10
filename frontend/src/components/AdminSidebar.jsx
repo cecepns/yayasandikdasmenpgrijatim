@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, FileText, Database, BookOpen, LogOut, Menu, X, ArrowLeft, UserCheck } from 'lucide-react';
+import { ShieldCheck, FileText, Database, BookOpen, LogOut, Menu, X, ArrowLeft, UserCheck, Users, Settings } from 'lucide-react';
 
 export default function AdminSidebar({ activeTab, setActiveTab, onLogout }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -9,7 +9,8 @@ export default function AdminSidebar({ activeTab, setActiveTab, onLogout }) {
     { id: 'berita', label: 'Kelola Berita', icon: BookOpen },
     { id: 'persuratan', label: 'Layanan Persuratan', icon: FileText },
     { id: 'lembaga', label: 'Data Lembaga (SIL)', icon: Database },
-    { id: 'settings', label: 'Profil Ketua Yayasan', icon: UserCheck },
+    { id: 'pengurus', label: 'Pengurus Yayasan', icon: Users },
+    { id: 'settings', label: 'Profil & Sambutan', icon: Settings },
   ];
 
   return (

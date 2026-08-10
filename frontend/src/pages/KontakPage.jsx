@@ -63,7 +63,7 @@ export default function KontakPage() {
                   <MapPin className="w-5 h-5 text-red-500 shrink-0 mt-1" />
                   <div>
                     <span className="font-bold text-white block">Alamat Kantor:</span>
-                    <span>Gedung Guru PGRI Jawa Timur, Jl. Ahmad Yani No. 2-4, Surabaya, Jawa Timur</span>
+                    <span>Jl. Wonorejo Timur Blok A Nomor 43 – Rungkut – Surabaya, Kode Pos 60296</span>
                   </div>
                 </div>
 
@@ -79,7 +79,7 @@ export default function KontakPage() {
                   <Mail className="w-5 h-5 text-blue-400 shrink-0" />
                   <div>
                     <span className="font-bold text-white block">Email Resmi:</span>
-                    <span>sekretariat@yayasandikdasmenpgrijatim.com</span>
+                    <span>yplpdmpgrijatim@gmail.com</span>
                   </div>
                 </div>
 
@@ -87,7 +87,7 @@ export default function KontakPage() {
                   <Globe className="w-5 h-5 text-yellow-400 shrink-0" />
                   <div>
                     <span className="font-bold text-white block">Website Domain:</span>
-                    <span>www.yayasandikdasmenpgrijatim.com</span>
+                    <span>www.yplpdm_pgrijatim.com</span>
                   </div>
                 </div>
               </div>

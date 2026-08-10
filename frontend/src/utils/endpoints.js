@@ -25,5 +25,11 @@ export const API_ENDPOINTS = {
   SETTINGS: {
     GET: "/settings",
     UPDATE: "/settings"
+  },
+  PENGURUS: {
+    LIST: "/pengurus",
+    CREATE: "/pengurus",
+    UPDATE: (id) => `/pengurus/${id}`,
+    DELETE: (id) => `/pengurus/${id}`,
   }
 };

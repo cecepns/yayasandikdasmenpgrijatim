@@ -81,7 +81,7 @@ INSERT INTO `sistem_informasi_lembaga` (`id`, `npsn`, `nama_sekolah`, `jenjang`,
 (4, '20503456', 'SD PGRI 3 Jember', 'SD/MI', 'Kab. Jember', 'Jl. Gajah Mada No. 100, Jember', 'Ahmad Fauzi, S.Pd', 280, 18, 'B', '0331-489900')
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
--- 5. Table settings (Pengaturan Profil Ketua & Website)
+-- 5. Table settings (Pengaturan Profil & Website)
 CREATE TABLE IF NOT EXISTS `settings` (
   `key` VARCHAR(50) PRIMARY KEY,
   `value` TEXT DEFAULT NULL,
@@ -92,6 +92,26 @@ INSERT INTO `settings` (`key`, `value`) VALUES
 ('nama_ketua', 'Drs. H. Winadi, M.Pd'),
 ('jabatan_ketua', 'Ketua Yayasan Dikdasmen PGRI Jawa Timur'),
 ('foto_ketua', NULL),
+('sejarah_yayasan', 'Yayasan Pembina Lembaga Pendidikan (YPLP) PGRI didirikan sebagai badan khusus Persatuan Guru Republik Indonesia yang bertugas membina, mengelola, dan mengikhtiarkan perkembangan lembaga pendidikan persekolahan PGRI di seluruh jenjang pendidikan dasar dan menengah.\n\nDi Jawa Timur, YPLP Dikdasmen PGRI tumbuh dan berkembang pesat seiring tingginya kebutuhan masyarakat akan pendidikan berkualitas, berkarakter nasionalis, dan terjangkau. Berawal dari inisiatif para tokoh pendidik PGRI Jawa Timur untuk memberikan wadah formal bagi sekolah-sekolah swasta PGRI agar memiliki standar kurikulum, tata kelola, serta sarana prasarana yang tangguh.\n\nHingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pusat pengayoman modern yang memadukan semangat historis pengabdian guru dengan modernisasi digitalisasi layanan pendidikan.'),
+('visi_yayasan', 'Menjadi lembaga pembina pendidikan yang unggul, profesional, berkarakter Pancasila, dan terdepan dalam mewujudkan pendidikan bermutu di Jawa Timur.'),
+('misi_yayasan', 'Meningkatkan mutu tata kelola lembaga pendidikan PGRI di seluruh kabupaten/kota se-Jawa Timur.\nMendorong profesionalisme, kesejahteraan, dan kompetensi tenaga pendidik dan kependidikan.\nMengembangkan digitalisasi layanan persuratan dan sistem informasi manajemen sekolah.\nMembangun karakter generasi muda yang cerdas, berakhlak mulia, dan berdaya saing global.'),
 ('sambutan_ketua', 'Assalamu\'alaikum Warahmatullahi Wabarakatuh.\nSalam sejahtera untuk kita semua.\n\nPuji syukur ke hadirat Allah SWT atas segala rahmat dan karunia-Nya, sehingga Website Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah (Dikdasmen) PGRI Jawa Timur dapat hadir sebagai media informasi, komunikasi, dan kolaborasi bagi seluruh keluarga besar PGRI serta masyarakat luas.\n\nSelamat datang di website resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur.\n\nKami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Oleh karena itu, Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, mendukung profesionalisme tenaga pendidik dan kependidikan, serta mendorong lahirnya generasi yang cerdas, berakhlak mulia, kreatif, dan berdaya saing.\n\nWebsite ini kami hadirkan sebagai wujud keterbukaan informasi sekaligus sarana untuk mempererat sinergi antara yayasan, sekolah, guru, tenaga kependidikan, orang tua, alumni, pemerintah, dan seluruh pemangku kepentingan. Melalui media ini, kami berharap masyarakat dapat memperoleh informasi yang akurat mengenai program, kegiatan, prestasi, serta berbagai inovasi yang dikembangkan oleh Yayasan Dikdasmen PGRI Jawa Timur.\n\nKami mengajak seluruh keluarga besar Lembaga Pendidikan PGRI Jawa Timur untuk terus menjaga semangat kebersamaan, profesionalisme, dan pengabdian dalam memajukan pendidikan. Dengan kolaborasi yang kuat, insya Allah kita dapat memberikan kontribusi nyata dalam mencerdaskan kehidupan bangsa serta mewujudkan pendidikan yang berkualitas, inklusif, dan berkelanjutan. Semangat kolaborasi dan pemanfaatan teknologi digital juga menjadi bagian penting dalam meningkatkan layanan dan transparansi lembaga pendidikan.\n\nAkhir kata, kami mengucapkan terima kasih kepada seluruh pihak yang telah memberikan dukungan dan kepercayaan kepada Yayasan Dikdasmen PGRI Jawa Timur. Semoga Allah SWT senantiasa memberikan petunjuk, kekuatan, dan keberkahan kepada kita semua dalam mengemban amanah mencerdaskan generasi penerus bangsa.\n\nWassalamu\'alaikum Warahmatullahi Wabarakatuh.')
 ON DUPLICATE KEY UPDATE `key`=`key`;
 
+-- 6. Table pengurus (Pengurus Yayasan)
+CREATE TABLE IF NOT EXISTS `pengurus` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nama` VARCHAR(100) NOT NULL,
+  `jabatan` VARCHAR(100) NOT NULL,
+  `kategori` VARCHAR(100) DEFAULT 'Pengurus Harian',
+  `foto` VARCHAR(255) DEFAULT NULL,
+  `deskripsi` TEXT DEFAULT NULL,
+  `urutan` INT DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO `pengurus` (`id`, `nama`, `jabatan`, `kategori`, `foto`, `deskripsi`, `urutan`) VALUES
+(1, 'Drs. H. Winadi, M.Pd', 'Ketua Yayasan', 'Pengurus Harian', NULL, 'Memimpin penyelenggaraan dan perumusan kebijakan pengayoman sekolah-sekolah PGRI di Jawa Timur.', 1),
+(2, 'Drs. Supriyanto, M.Pd', 'Sekretaris Yayasan', 'Pengurus Harian', NULL, 'Mengelola tata kelola persuratan, tata usaha, serta hubungan antar lembaga perwakilan kabupaten/kota.', 2),
+(3, 'H. Budi Santoso, SE, M.M', 'Bendahara Yayasan', 'Pengurus Harian', NULL, 'Bertanggung jawab atas pengelolaan dana, akuntabilitas keuangan, dan pengembangan sarana prasarana sekolah.', 3)
+ON DUPLICATE KEY UPDATE `id`=`id`;

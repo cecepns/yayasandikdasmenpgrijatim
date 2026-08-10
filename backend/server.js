@@ -150,6 +150,35 @@ let memoryDatabase = {
       akreditasi: 'B',
       kontak: '0331-489900'
     }
+  ],
+  pengurus: [
+    {
+      id: 1,
+      nama: 'Drs. H. Winadi, M.Pd',
+      jabatan: 'Ketua Yayasan',
+      kategori: 'Pengurus Harian',
+      foto: null,
+      deskripsi: 'Memimpin penyelenggaraan dan perumusan kebijakan pengayoman sekolah-sekolah PGRI di Jawa Timur.',
+      urutan: 1
+    },
+    {
+      id: 2,
+      nama: 'Drs. Supriyanto, M.Pd',
+      jabatan: 'Sekretaris Yayasan',
+      kategori: 'Pengurus Harian',
+      foto: null,
+      deskripsi: 'Mengelola tata kelola persuratan, tata usaha, serta hubungan antar lembaga perwakilan kabupaten/kota.',
+      urutan: 2
+    },
+    {
+      id: 3,
+      nama: 'H. Budi Santoso, SE, M.M',
+      jabatan: 'Bendahara Yayasan',
+      kategori: 'Pengurus Harian',
+      foto: null,
+      deskripsi: 'Bertanggung jawab atas pengelolaan dana, akuntabilitas keuangan, dan pengembangan sarana prasarana sekolah.',
+      urutan: 3
+    }
   ]
 };
 
@@ -599,10 +628,124 @@ app.delete('/api/lembaga/:id', async (req, res) => {
   res.json({ success: true, message: 'Data lembaga berhasil dihapus' });
 });
 
+// PENGURUS YAYASAN API
+app.get('/api/pengurus', async (req, res) => {
+  const search = req.query.search || '';
+  const pool = await getDbConnection();
+  if (pool) {
+    try {
+      const searchPattern = `%${search}%`;
+      const [rows] = await pool.query(
+        'SELECT * FROM pengurus WHERE nama LIKE ? OR jabatan LIKE ? OR kategori LIKE ? ORDER BY urutan ASC, id ASC',
+        [searchPattern, searchPattern, searchPattern]
+      );
+      return res.json({ success: true, data: rows });
+    } catch (e) { console.error(e); }
+  }
+
+  let filtered = memoryDatabase.pengurus.filter(p =>
+    p.nama.toLowerCase().includes(search.toLowerCase()) ||
+    p.jabatan.toLowerCase().includes(search.toLowerCase()) ||
+    p.kategori.toLowerCase().includes(search.toLowerCase())
+  );
+  filtered.sort((a, b) => a.urutan - b.urutan);
+  return res.json({ success: true, data: filtered });
+});
+
+app.post('/api/pengurus', upload.single('foto'), async (req, res) => {
+  const { nama, jabatan, kategori, deskripsi, urutan } = req.body;
+  const foto = req.file ? `/uploads/${req.file.filename}` : null;
+
+  const pool = await getDbConnection();
+  if (pool) {
+    try {
+      const [result] = await pool.query(
+        'INSERT INTO pengurus (nama, jabatan, kategori, foto, deskripsi, urutan) VALUES (?, ?, ?, ?, ?, ?)',
+        [nama, jabatan, kategori || 'Pengurus Harian', foto, deskripsi || '', parseInt(urutan) || 1]
+      );
+      return res.status(201).json({ success: true, message: 'Data pengurus berhasil ditambahkan', data: { id: result.insertId } });
+    } catch (e) { console.error(e); }
+  }
+
+  const newItem = {
+    id: memoryDatabase.pengurus.length + 1,
+    nama,
+    jabatan,
+    kategori: kategori || 'Pengurus Harian',
+    foto,
+    deskripsi: deskripsi || '',
+    urutan: parseInt(urutan) || 1
+  };
+  memoryDatabase.pengurus.push(newItem);
+  res.status(201).json({ success: true, message: 'Data pengurus berhasil ditambahkan', data: newItem });
+});
+
+app.put('/api/pengurus/:id', upload.single('foto'), async (req, res) => {
+  const { id } = req.params;
+  const { nama, jabatan, kategori, deskripsi, urutan } = req.body;
+  let foto = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+  const pool = await getDbConnection();
+  if (pool) {
+    try {
+      if (foto) {
+        await pool.query(
+          'UPDATE pengurus SET nama=?, jabatan=?, kategori=?, deskripsi=?, urutan=?, foto=? WHERE id=?',
+          [nama, jabatan, kategori, deskripsi, parseInt(urutan) || 1, foto, id]
+        );
+      } else {
+        await pool.query(
+          'UPDATE pengurus SET nama=?, jabatan=?, kategori=?, deskripsi=?, urutan=? WHERE id=?',
+          [nama, jabatan, kategori, deskripsi, parseInt(urutan) || 1, id]
+        );
+      }
+      return res.json({ success: true, message: 'Data pengurus berhasil diperbarui' });
+    } catch (e) { console.error(e); }
+  }
+
+  const index = memoryDatabase.pengurus.findIndex(p => p.id == id);
+  if (index !== -1) {
+    memoryDatabase.pengurus[index] = {
+      ...memoryDatabase.pengurus[index],
+      nama,
+      jabatan,
+      kategori,
+      deskripsi,
+      urutan: parseInt(urutan) || 1,
+      ...(foto ? { foto } : {})
+    };
+    return res.json({ success: true, message: 'Data pengurus berhasil diperbarui', data: memoryDatabase.pengurus[index] });
+  }
+  res.status(404).json({ success: false, message: 'Data pengurus tidak ditemukan' });
+});
+
+app.delete('/api/pengurus/:id', async (req, res) => {
+  const { id } = req.params;
+  const pool = await getDbConnection();
+  if (pool) {
+    try {
+      await pool.query('DELETE FROM pengurus WHERE id = ?', [id]);
+      return res.json({ success: true, message: 'Data pengurus berhasil dihapus' });
+    } catch (e) { console.error(e); }
+  }
+  memoryDatabase.pengurus = memoryDatabase.pengurus.filter(p => p.id != id);
+  res.json({ success: true, message: 'Data pengurus berhasil dihapus' });
+});
+
 memoryDatabase.settings = {
   nama_ketua: 'Drs. H. Winadi, M.Pd',
   jabatan_ketua: 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
   foto_ketua: null,
+  sejarah_yayasan: `Yayasan Pembina Lembaga Pendidikan (YPLP) PGRI didirikan sebagai badan khusus Persatuan Guru Republik Indonesia yang bertugas membina, mengelola, dan mengikhtiarkan perkembangan lembaga pendidikan persekolahan PGRI di seluruh jenjang pendidikan dasar dan menengah.
+
+Di Jawa Timur, YPLP Dikdasmen PGRI tumbuh dan berkembang pesat seiring tingginya kebutuhan masyarakat akan pendidikan berkualitas, berkarakter nasionalis, dan terjangkau. Berawal dari inisiatif para tokoh pendidik PGRI Jawa Timur untuk memberikan wadah formal bagi sekolah-sekolah swasta PGRI agar memiliki standar kurikulum, tata kelola, serta sarana prasarana yang tangguh.
+
+Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pusat pengayoman modern yang memadukan semangat historis pengabdian guru dengan modernisasi digitalisasi layanan pendidikan.`,
+  visi_yayasan: `Menjadi lembaga pembina pendidikan yang unggul, profesional, berkarakter Pancasila, dan terdepan dalam mewujudkan pendidikan bermutu di Jawa Timur.`,
+  misi_yayasan: `Meningkatkan mutu tata kelola lembaga pendidikan PGRI di seluruh kabupaten/kota se-Jawa Timur.
+Mendorong profesionalisme, kesejahteraan, dan kompetensi tenaga pendidik dan kependidikan.
+Mengembangkan digitalisasi layanan persuratan dan sistem informasi manajemen sekolah.
+Membangun karakter generasi muda yang cerdas, berakhlak mulia, dan berdaya saing global.`,
   sambutan_ketua: `Assalamu'alaikum Warahmatullahi Wabarakatuh.
 Salam sejahtera untuk kita semua.
 
@@ -619,9 +762,9 @@ Kami mengajak seluruh keluarga besar Lembaga Pendidikan PGRI Jawa Timur untuk te
 Akhir kata, kami mengucapkan terima kasih kepada seluruh pihak yang telah memberikan dukungan dan kepercayaan kepada Yayasan Dikdasmen PGRI Jawa Timur. Semoga Allah SWT senantiasa memberikan petunjuk, kekuatan, dan keberkahan kepada kita semua dalam mengemban amanah mencerdaskan generasi penerus bangsa.
 
 Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
-  };
+};
 
-// SETTINGS API (Dynamic Ketua Yayasan Info & Foto)
+// SETTINGS API (Dynamic Profil Yayasan & Ketua Info)
 app.get('/api/settings', async (req, res) => {
   const pool = await getDbConnection();
   if (pool) {
@@ -636,7 +779,7 @@ app.get('/api/settings', async (req, res) => {
 });
 
 app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
-  const { nama_ketua, jabatan_ketua, sambutan_ketua } = req.body;
+  const { nama_ketua, jabatan_ketua, sambutan_ketua, sejarah_yayasan, visi_yayasan, misi_yayasan } = req.body;
   let foto_ketua = req.file ? `/uploads/${req.file.filename}` : undefined;
 
   const pool = await getDbConnection();
@@ -645,21 +788,27 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
       if (nama_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['nama_ketua', nama_ketua, nama_ketua]);
       if (jabatan_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['jabatan_ketua', jabatan_ketua, jabatan_ketua]);
       if (sambutan_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['sambutan_ketua', sambutan_ketua, sambutan_ketua]);
+      if (sejarah_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['sejarah_yayasan', sejarah_yayasan, sejarah_yayasan]);
+      if (visi_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['visi_yayasan', visi_yayasan, visi_yayasan]);
+      if (misi_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['misi_yayasan', misi_yayasan, misi_yayasan]);
       if (foto_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['foto_ketua', foto_ketua, foto_ketua]);
 
       const [rows] = await pool.query('SELECT * FROM settings');
       const settingsObj = {};
       rows.forEach(r => { settingsObj[r.key] = r.value; });
-      return res.json({ success: true, message: 'Pengaturan Profil & Sambutan Ketua Yayasan berhasil diperbarui', data: settingsObj });
+      return res.json({ success: true, message: 'Pengaturan Profil Yayasan berhasil diperbarui', data: settingsObj });
     } catch (e) { console.error(e); }
   }
 
   if (nama_ketua) memoryDatabase.settings.nama_ketua = nama_ketua;
   if (jabatan_ketua) memoryDatabase.settings.jabatan_ketua = jabatan_ketua;
   if (sambutan_ketua) memoryDatabase.settings.sambutan_ketua = sambutan_ketua;
+  if (sejarah_yayasan) memoryDatabase.settings.sejarah_yayasan = sejarah_yayasan;
+  if (visi_yayasan) memoryDatabase.settings.visi_yayasan = visi_yayasan;
+  if (misi_yayasan) memoryDatabase.settings.misi_yayasan = misi_yayasan;
   if (foto_ketua) memoryDatabase.settings.foto_ketua = foto_ketua;
 
-  res.json({ success: true, message: 'Pengaturan Profil & Sambutan Ketua Yayasan berhasil diperbarui', data: memoryDatabase.settings });
+  res.json({ success: true, message: 'Pengaturan Profil Yayasan berhasil diperbarui', data: memoryDatabase.settings });
 });
 
 app.listen(PORT, () => {

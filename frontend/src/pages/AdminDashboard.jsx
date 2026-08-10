@@ -41,10 +41,16 @@ export default function AdminDashboard() {
     npsn: '', nama_sekolah: '', jenjang: 'SMA/MA', kabupaten_kota: 'Kota Surabaya',
     alamat: '', kepala_sekolah: '', jumlah_siswa: 0, jumlah_guru: 0, akreditasi: 'A', kontak: ''
   });
+  const [pengurusForm, setPengurusForm] = useState({
+    nama: '', jabatan: '', kategori: 'Pengurus Harian', deskripsi: '', urutan: 1, foto: null
+  });
   const [settingsForm, setSettingsForm] = useState({
     nama_ketua: 'Drs. H. Winadi, M.Pd',
     jabatan_ketua: 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
     sambutan_ketua: '',
+    sejarah_yayasan: '',
+    visi_yayasan: '',
+    misi_yayasan: '',
     foto_ketua: null,
     current_foto: ''
   });
@@ -79,6 +85,9 @@ export default function AdminDashboard() {
         nama_ketua: data.data.nama_ketua || 'Drs. H. Winadi, M.Pd',
         jabatan_ketua: data.data.jabatan_ketua || 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
         sambutan_ketua: data.data.sambutan_ketua || '',
+        sejarah_yayasan: data.data.sejarah_yayasan || '',
+        visi_yayasan: data.data.visi_yayasan || '',
+        misi_yayasan: data.data.misi_yayasan || '',
         current_foto: data.data.foto_ketua || ''
       }));
     }
@@ -91,6 +100,9 @@ export default function AdminDashboard() {
     formData.append('nama_ketua', settingsForm.nama_ketua);
     formData.append('jabatan_ketua', settingsForm.jabatan_ketua);
     formData.append('sambutan_ketua', settingsForm.sambutan_ketua);
+    formData.append('sejarah_yayasan', settingsForm.sejarah_yayasan);
+    formData.append('visi_yayasan', settingsForm.visi_yayasan);
+    formData.append('misi_yayasan', settingsForm.misi_yayasan);
     if (settingsForm.foto_ketua) {
       formData.append('foto_ketua', settingsForm.foto_ketua);
     }
@@ -103,9 +115,9 @@ export default function AdminDashboard() {
 
     setSettingsLoading(false);
     if (error) {
-      toast.error('Gagal memperbarui pengaturan ketua yayasan');
+      toast.error('Gagal memperbarui profil yayasan');
     } else {
-      toast.success('Profil & Sambutan Ketua Yayasan berhasil disimpan!');
+      toast.success('Profil & Sambutan Yayasan berhasil disimpan!');
       if (data?.data?.foto_ketua) {
         setSettingsForm(prev => ({ ...prev, current_foto: data.data.foto_ketua }));
       }
@@ -132,6 +144,7 @@ export default function AdminDashboard() {
     let endpoint = API_ENDPOINTS.BERITA.LIST;
     if (tab === 'persuratan') endpoint = API_ENDPOINTS.PERSURATAN.LIST;
     if (tab === 'lembaga') endpoint = API_ENDPOINTS.LEMBAGA.LIST;
+    if (tab === 'pengurus') endpoint = API_ENDPOINTS.PENGURUS.LIST;
 
     const { data, error } = await requestHandler(() =>
       api.get(endpoint, { params: { page, limit, search: querySearch } })
@@ -142,7 +155,7 @@ export default function AdminDashboard() {
       toast.error('Gagal memuat data');
     } else {
       setItems(data.data || []);
-      setPagination(data.pagination);
+      if (data.pagination) setPagination(data.pagination);
     }
   };
 
@@ -178,6 +191,7 @@ export default function AdminDashboard() {
     let endpoint = API_ENDPOINTS.BERITA.DELETE(id);
     if (activeTab === 'persuratan') endpoint = API_ENDPOINTS.PERSURATAN.DELETE(id);
     if (activeTab === 'lembaga') endpoint = API_ENDPOINTS.LEMBAGA.DELETE(id);
+    if (activeTab === 'pengurus') endpoint = API_ENDPOINTS.PENGURUS.DELETE(id);
 
     const { error } = await requestHandler(() => api.delete(endpoint));
     if (error) {
@@ -185,6 +199,32 @@ export default function AdminDashboard() {
     } else {
       toast.success('Data berhasil dihapus');
       loadTabData(activeTab, pagination.page, pagination.limit, debouncedSearch);
+    }
+  };
+
+  // Submit Pengurus
+  const handleSubmitPengurus = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    data.append('nama', pengurusForm.nama);
+    data.append('jabatan', pengurusForm.jabatan);
+    data.append('kategori', pengurusForm.kategori);
+    data.append('deskripsi', pengurusForm.deskripsi);
+    data.append('urutan', pengurusForm.urutan);
+    if (pengurusForm.foto) data.append('foto', pengurusForm.foto);
+
+    let requestFn = () => api.post(API_ENDPOINTS.PENGURUS.CREATE, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+    if (editItem) {
+      requestFn = () => api.put(API_ENDPOINTS.PENGURUS.UPDATE(editItem.id), data, { headers: { 'Content-Type': 'multipart/form-data' } });
+    }
+
+    const { error } = await requestHandler(requestFn);
+    if (error) {
+      toast.error(error);
+    } else {
+      toast.success(editItem ? 'Data pengurus berhasil diperbarui' : 'Pengurus baru berhasil ditambahkan');
+      setIsModalOpen(false);
+      loadTabData('pengurus', pagination.page, pagination.limit, debouncedSearch);
     }
   };
 
@@ -327,12 +367,14 @@ export default function AdminDashboard() {
               {activeTab === 'berita' && 'Kelola Berita & Informasi'}
               {activeTab === 'persuratan' && 'Manajemen Layanan Persuratan'}
               {activeTab === 'lembaga' && 'Sistem Informasi Lembaga (SIL)'}
+              {activeTab === 'pengurus' && 'Manajemen Pengurus Yayasan'}
+              {activeTab === 'settings' && 'Kelola Profil, Visi Misi & Sambutan'}
             </h1>
             <p className="text-xs text-slate-500 font-medium">Panel Pengurus Yayasan Dikdasmen PGRI Jawa Timur</p>
           </div>
 
           {/* Create Button */}
-          {activeTab !== 'persuratan' && (
+          {activeTab !== 'persuratan' && activeTab !== 'settings' && (
             <button
               onClick={() => {
                 setEditItem(null);
@@ -345,12 +387,19 @@ export default function AdminDashboard() {
                     alamat: '', kepala_sekolah: '', jumlah_siswa: 0, jumlah_guru: 0, akreditasi: 'A', kontak: ''
                   });
                 }
+                if (activeTab === 'pengurus') {
+                  setPengurusForm({ nama: '', jabatan: '', kategori: 'Pengurus Harian', deskripsi: '', urutan: 1, foto: null });
+                }
                 setIsModalOpen(true);
               }}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md transition-all"
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah {activeTab === 'berita' ? 'Berita Baru' : 'Lembaga Sekolah'}</span>
+              <span>
+                {activeTab === 'berita' && 'Tambah Berita Baru'}
+                {activeTab === 'lembaga' && 'Tambah Lembaga Sekolah'}
+                {activeTab === 'pengurus' && 'Tambah Pengurus Yayasan'}
+              </span>
             </button>
           )}
         </div>
@@ -543,74 +592,182 @@ export default function AdminDashboard() {
                 </table>
               )}
 
-              {/* 4. SETTINGS FORM (PROFIL KETUA YAYASAN) */}
-              {activeTab === 'settings' && (
-                <div className="p-8 max-w-2xl">
-                  <form onSubmit={handleSaveSettings} className="space-y-6">
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Nama Ketua Yayasan *</label>
-                      <input
-                        type="text"
-                        value={settingsForm.nama_ketua}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, nama_ketua: e.target.value })}
-                        required
-                        className="w-full p-3 rounded-xl border border-slate-300 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Jabatan Ketua *</label>
-                      <input
-                        type="text"
-                        value={settingsForm.jabatan_ketua}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, jabatan_ketua: e.target.value })}
-                        required
-                        className="w-full p-3 rounded-xl border border-slate-300 text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Teks Kata Sambutan Ketua Yayasan *</label>
-                      <textarea
-                        rows={8}
-                        value={settingsForm.sambutan_ketua}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, sambutan_ketua: e.target.value })}
-                        placeholder="Tuliskan pidato / kata sambutan lengkap ketua yayasan..."
-                        className="w-full p-3 rounded-xl border border-slate-300 text-sm font-normal leading-relaxed"
-                      ></textarea>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Upload Foto Resmi Ketua Yayasan</label>
-
-                      {settingsForm.current_foto && (
-                        <div className="flex items-center gap-4 mb-4 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-                          <img
-                            src={settingsForm.current_foto.startsWith('http') || settingsForm.current_foto.startsWith('/') ? settingsForm.current_foto : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${settingsForm.current_foto}`}
-                            alt="Foto Ketua Yayasan saat ini"
-                            className="w-16 h-16 rounded-full object-cover border-2 border-red-700"
-                          />
-                          <div className="text-xs text-slate-600">
-                            <span className="font-semibold block text-slate-900">Foto Ketua Saat Ini</span>
-                            <span>Akan diganti jika Anda mengunggah berkas baru di bawah.</span>
+              {/* 4. TABLE PENGURUS YAYASAN */}
+              {activeTab === 'pengurus' && (
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-6">Urutan & Nama Pengurus</th>
+                      <th className="py-3 px-4">Jabatan</th>
+                      <th className="py-3 px-4">Kategori / Divisi</th>
+                      <th className="py-3 px-4">Deskripsi Peran</th>
+                      <th className="py-3 px-4 text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {items.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center">
+                              {item.urutan}
+                            </span>
+                            <div>
+                              <div className="font-bold text-slate-900">{item.nama}</div>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        </td>
+                        <td className="py-4 px-4 font-semibold text-red-700">{item.jabatan}</td>
+                        <td className="py-4 px-4">
+                          <span className="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-semibold">
+                            {item.kategori}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-xs text-slate-600 max-w-xs">{item.deskripsi || '-'}</td>
+                        <td className="py-4 px-4 text-center space-x-2">
+                          <button
+                            onClick={() => {
+                              setEditItem(item);
+                              setPengurusForm({
+                                nama: item.nama,
+                                jabatan: item.jabatan,
+                                kategori: item.kategori || 'Pengurus Harian',
+                                deskripsi: item.deskripsi || '',
+                                urutan: item.urutan || 1,
+                                foto: null
+                              });
+                              setIsModalOpen(true);
+                            }}
+                            className="p-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id, item.nama)}
+                            className="p-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
 
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setSettingsForm({ ...settingsForm, foto_ketua: e.target.files[0] })}
-                        className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-slate-300 rounded-xl p-1 bg-white"
-                      />
+              {/* 5. SETTINGS FORM (PROFIL YAYASAN & KETUA) */}
+              {activeTab === 'settings' && (
+                <div className="p-8 max-w-3xl space-y-8">
+                  <form onSubmit={handleSaveSettings} className="space-y-6">
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                      <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <UserCheck className="w-5 h-5 text-red-700" />
+                        Pengaturan Profil Ketua Yayasan
+                      </h3>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Nama Ketua Yayasan *</label>
+                        <input
+                          type="text"
+                          value={settingsForm.nama_ketua}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, nama_ketua: e.target.value })}
+                          required
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Jabatan Ketua *</label>
+                        <input
+                          type="text"
+                          value={settingsForm.jabatan_ketua}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, jabatan_ketua: e.target.value })}
+                          required
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Teks Kata Sambutan Ketua Yayasan *</label>
+                        <textarea
+                          rows={6}
+                          value={settingsForm.sambutan_ketua}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, sambutan_ketua: e.target.value })}
+                          placeholder="Tuliskan pidato / kata sambutan lengkap ketua yayasan..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm font-normal leading-relaxed bg-white"
+                        ></textarea>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Upload Foto Resmi Ketua Yayasan</label>
+                        {settingsForm.current_foto && (
+                          <div className="flex items-center gap-4 mb-4 p-3 bg-white border border-slate-200 rounded-2xl">
+                            <img
+                              src={settingsForm.current_foto.startsWith('http') || settingsForm.current_foto.startsWith('/') ? settingsForm.current_foto : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${settingsForm.current_foto}`}
+                              alt="Foto Ketua Yayasan saat ini"
+                              className="w-16 h-16 rounded-full object-cover border-2 border-red-700"
+                            />
+                            <div className="text-xs text-slate-600">
+                              <span className="font-semibold block text-slate-900">Foto Ketua Saat Ini</span>
+                              <span>Akan diganti jika Anda mengunggah berkas baru.</span>
+                            </div>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setSettingsForm({ ...settingsForm, foto_ketua: e.target.files[0] })}
+                          className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-slate-300 rounded-xl p-1 bg-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                      <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-emerald-700" />
+                        Pengaturan Visi, Misi & Sejarah Yayasan
+                      </h3>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Visi Yayasan</label>
+                        <textarea
+                          rows={3}
+                          value={settingsForm.visi_yayasan}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, visi_yayasan: e.target.value })}
+                          placeholder="Visi resmi yayasan..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        ></textarea>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Misi Yayasan (Pisahkan dengan baris baru untuk tiap poin)</label>
+                        <textarea
+                          rows={5}
+                          value={settingsForm.misi_yayasan}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, misi_yayasan: e.target.value })}
+                          placeholder="Tuliskan poin-poin misi..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        ></textarea>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Sejarah Yayasan</label>
+                        <textarea
+                          rows={6}
+                          value={settingsForm.sejarah_yayasan}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, sejarah_yayasan: e.target.value })}
+                          placeholder="Teks sejarah singkat pembentukan yayasan..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        ></textarea>
+                      </div>
                     </div>
 
                     <button
                       type="submit"
                       disabled={settingsLoading}
-                      className="px-6 py-3 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md disabled:opacity-50 transition-all"
+                      className="w-full py-3.5 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md disabled:opacity-50 transition-all"
                     >
-                      {settingsLoading ? 'Menyimpan...' : 'Simpan Pengaturan Ketua'}
+                      {settingsLoading ? 'Menyimpan...' : 'Simpan Semua Pengaturan Profil'}
                     </button>
                   </form>
                 </div>
@@ -638,9 +795,91 @@ export default function AdminDashboard() {
         title={
           activeTab === 'berita' ? (editItem ? 'Edit Berita' : 'Tambah Berita Baru') :
             activeTab === 'persuratan' ? 'Update Status Persuratan' :
-              (editItem ? 'Edit Data Lembaga' : 'Tambah Data Lembaga')
+              activeTab === 'pengurus' ? (editItem ? 'Edit Pengurus Yayasan' : 'Tambah Pengurus Yayasan') :
+                (editItem ? 'Edit Data Lembaga' : 'Tambah Data Lembaga')
         }
       >
+        {activeTab === 'pengurus' && (
+          <form onSubmit={handleSubmitPengurus} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Nama Lengkap Pengurus *</label>
+              <input
+                type="text"
+                value={pengurusForm.nama}
+                onChange={(e) => setPengurusForm({ ...pengurusForm, nama: e.target.value })}
+                required
+                placeholder="Contoh: Drs. H. Winadi, M.Pd"
+                className="w-full p-3 rounded-xl border border-slate-300 text-sm"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Jabatan *</label>
+                <input
+                  type="text"
+                  value={pengurusForm.jabatan}
+                  onChange={(e) => setPengurusForm({ ...pengurusForm, jabatan: e.target.value })}
+                  required
+                  placeholder="Contoh: Ketua Yayasan / Sekretaris"
+                  className="w-full p-3 rounded-xl border border-slate-300 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Kategori / Divisi</label>
+                <select
+                  value={pengurusForm.kategori}
+                  onChange={(e) => setPengurusForm({ ...pengurusForm, kategori: e.target.value })}
+                  className="w-full p-3 rounded-xl border border-slate-300 text-sm"
+                >
+                  <option value="Pengurus Harian">Pengurus Harian</option>
+                  <option value="Pembina">Pembina</option>
+                  <option value="Pengawas">Pengawas</option>
+                  <option value="Bidang Pendidikan">Bidang Pendidikan</option>
+                  <option value="Bidang Keuangan & Aset">Bidang Keuangan & Aset</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Urutan Tampilan</label>
+                <input
+                  type="number"
+                  value={pengurusForm.urutan}
+                  onChange={(e) => setPengurusForm({ ...pengurusForm, urutan: e.target.value })}
+                  className="w-full p-3 rounded-xl border border-slate-300 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Upload Foto Pengurus (Opsional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setPengurusForm({ ...pengurusForm, foto: e.target.files[0] })}
+                  className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-slate-300 rounded-xl p-1 bg-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Deskripsi Tugas / Catatan Singkat</label>
+              <textarea
+                rows={3}
+                value={pengurusForm.deskripsi}
+                onChange={(e) => setPengurusForm({ ...pengurusForm, deskripsi: e.target.value })}
+                placeholder="Tugas & wewenang pengurus..."
+                className="w-full p-3 rounded-xl border border-slate-300 text-sm"
+              ></textarea>
+            </div>
+
+            <button type="submit" className="w-full py-3 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+              Simpan Data Pengurus
+            </button>
+          </form>
+        )}
         {activeTab === 'berita' && (
           <form onSubmit={handleSubmitBerita} className="space-y-4">
             <div>
