@@ -16,7 +16,11 @@ export default function Home() {
   const [settings, setSettings] = useState({
     nama_ketua: 'Drs. H. Winadi, M.Pd',
     jabatan_ketua: 'Ketua Yayasan Dikdasmen PGRI Jatim',
-    foto_ketua: null
+    foto_ketua: null,
+    stat_kabupaten: '38',
+    stat_sekolah: '500+',
+    stat_guru: '15.000+',
+    stat_siswa: '100.000+'
   });
 
   useEffect(() => {
@@ -35,7 +39,11 @@ export default function Home() {
         ...prev,
         nama_ketua: data.data.nama_ketua || prev.nama_ketua,
         jabatan_ketua: data.data.jabatan_ketua || prev.jabatan_ketua,
-        foto_ketua: data.data.foto_ketua || null
+        foto_ketua: data.data.foto_ketua || null,
+        stat_kabupaten: data.data.stat_kabupaten || '38',
+        stat_sekolah: data.data.stat_sekolah || '500+',
+        stat_guru: data.data.stat_guru || '15.000+',
+        stat_siswa: data.data.stat_siswa || '100.000+'
       }));
     }
   };
@@ -323,22 +331,22 @@ export default function Home() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
 
             <div data-aos="zoom-in">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">38</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">{settings.stat_kabupaten}</div>
               <div className="text-xs sm:text-sm text-slate-400 font-medium">Kabupaten / Kota se-Jatim</div>
             </div>
 
             <div data-aos="zoom-in" data-aos-delay="100">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">500+</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">{settings.stat_sekolah}</div>
               <div className="text-xs sm:text-sm text-slate-400 font-medium">Sekolah PGRI</div>
             </div>
 
             <div data-aos="zoom-in" data-aos-delay="200">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">15.000+</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">{settings.stat_guru}</div>
               <div className="text-xs sm:text-sm text-slate-400 font-medium">Guru & Pendidik</div>
             </div>
 
             <div data-aos="zoom-in" data-aos-delay="300">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">100.000+</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-yellow-400 mb-1">{settings.stat_siswa}</div>
               <div className="text-xs sm:text-sm text-slate-400 font-medium">Siswa & Peserta Didik</div>
             </div>
 

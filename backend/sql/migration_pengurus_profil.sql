@@ -32,5 +32,9 @@ CREATE TABLE IF NOT EXISTS `settings` (
 INSERT INTO `settings` (`key`, `value`) VALUES
 ('sejarah_yayasan', 'Yayasan Pembina Lembaga Pendidikan (YPLP) PGRI didirikan sebagai badan khusus Persatuan Guru Republik Indonesia yang bertugas membina, mengelola, dan mengikhtiarkan perkembangan lembaga pendidikan persekolahan PGRI di seluruh jenjang pendidikan dasar dan menengah.\n\nDi Jawa Timur, YPLP Dikdasmen PGRI tumbuh dan berkembang pesat seiring tingginya kebutuhan masyarakat akan pendidikan berkualitas, berkarakter nasionalis, dan terjangkau. Berawal dari inisiatif para tokoh pendidik PGRI Jawa Timur untuk memberikan wadah formal bagi sekolah-sekolah swasta PGRI agar memiliki standar kurikulum, tata kelola, serta sarana prasarana yang tangguh.\n\nHingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pusat pengayoman modern yang memadukan semangat historis pengabdian guru dengan modernisasi digitalisasi layanan pendidikan.'),
 ('visi_yayasan', 'Menjadi lembaga pembina pendidikan yang unggul, profesional, berkarakter Pancasila, dan terdepan dalam mewujudkan pendidikan bermutu di Jawa Timur.'),
-('misi_yayasan', 'Meningkatkan mutu tata kelola lembaga pendidikan PGRI di seluruh kabupaten/kota se-Jawa Timur.\nMendorong profesionalisme, kesejahteraan, dan kompetensi tenaga pendidik dan kependidikan.\nMengembangkan digitalisasi layanan persuratan dan sistem informasi manajemen sekolah.\nMembangun karakter generasi muda yang cerdas, berakhlak mulia, dan berdaya saing global.')
+('misi_yayasan', 'Meningkatkan mutu tata kelola lembaga pendidikan PGRI di seluruh kabupaten/kota se-Jawa Timur.\nMendorong profesionalisme, kesejahteraan, dan kompetensi tenaga pendidik dan kependidikan.\nMengembangkan digitalisasi layanan persuratan dan sistem informasi manajemen sekolah.\nMembangun karakter generasi muda yang cerdas, berakhlak mulia, dan berdaya saing global.'),
+('stat_kabupaten', '38'),
+('stat_sekolah', '500+'),
+('stat_guru', '15.000+'),
+('stat_siswa', '100.000+')
 ON DUPLICATE KEY UPDATE `key`=`key`;

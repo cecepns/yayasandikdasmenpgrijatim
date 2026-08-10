@@ -761,7 +761,11 @@ Kami mengajak seluruh keluarga besar Lembaga Pendidikan PGRI Jawa Timur untuk te
 
 Akhir kata, kami mengucapkan terima kasih kepada seluruh pihak yang telah memberikan dukungan dan kepercayaan kepada Yayasan Dikdasmen PGRI Jawa Timur. Semoga Allah SWT senantiasa memberikan petunjuk, kekuatan, dan keberkahan kepada kita semua dalam mengemban amanah mencerdaskan generasi penerus bangsa.
 
-Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
+Wassalamu'alaikum Warahmatullahi Wabarakatuh.`,
+  stat_kabupaten: '38',
+  stat_sekolah: '500+',
+  stat_guru: '15.000+',
+  stat_siswa: '100.000+'
 };
 
 // SETTINGS API (Dynamic Profil Yayasan & Ketua Info)
@@ -779,7 +783,7 @@ app.get('/api/settings', async (req, res) => {
 });
 
 app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
-  const { nama_ketua, jabatan_ketua, sambutan_ketua, sejarah_yayasan, visi_yayasan, misi_yayasan } = req.body;
+  const { nama_ketua, jabatan_ketua, sambutan_ketua, sejarah_yayasan, visi_yayasan, misi_yayasan, stat_kabupaten, stat_sekolah, stat_guru, stat_siswa } = req.body;
   let foto_ketua = req.file ? `/uploads/${req.file.filename}` : undefined;
 
   const pool = await getDbConnection();
@@ -791,6 +795,10 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
       if (sejarah_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['sejarah_yayasan', sejarah_yayasan, sejarah_yayasan]);
       if (visi_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['visi_yayasan', visi_yayasan, visi_yayasan]);
       if (misi_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['misi_yayasan', misi_yayasan, misi_yayasan]);
+      if (stat_kabupaten) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_kabupaten', stat_kabupaten, stat_kabupaten]);
+      if (stat_sekolah) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_sekolah', stat_sekolah, stat_sekolah]);
+      if (stat_guru) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_guru', stat_guru, stat_guru]);
+      if (stat_siswa) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['stat_siswa', stat_siswa, stat_siswa]);
       if (foto_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['foto_ketua', foto_ketua, foto_ketua]);
 
       const [rows] = await pool.query('SELECT * FROM settings');
@@ -806,6 +814,10 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
   if (sejarah_yayasan) memoryDatabase.settings.sejarah_yayasan = sejarah_yayasan;
   if (visi_yayasan) memoryDatabase.settings.visi_yayasan = visi_yayasan;
   if (misi_yayasan) memoryDatabase.settings.misi_yayasan = misi_yayasan;
+  if (stat_kabupaten) memoryDatabase.settings.stat_kabupaten = stat_kabupaten;
+  if (stat_sekolah) memoryDatabase.settings.stat_sekolah = stat_sekolah;
+  if (stat_guru) memoryDatabase.settings.stat_guru = stat_guru;
+  if (stat_siswa) memoryDatabase.settings.stat_siswa = stat_siswa;
   if (foto_ketua) memoryDatabase.settings.foto_ketua = foto_ketua;
 
   res.json({ success: true, message: 'Pengaturan Profil Yayasan berhasil diperbarui', data: memoryDatabase.settings });

@@ -51,6 +51,10 @@ export default function AdminDashboard() {
     sejarah_yayasan: '',
     visi_yayasan: '',
     misi_yayasan: '',
+    stat_kabupaten: '38',
+    stat_sekolah: '500+',
+    stat_guru: '15.000+',
+    stat_siswa: '100.000+',
     foto_ketua: null,
     current_foto: ''
   });
@@ -88,6 +92,10 @@ export default function AdminDashboard() {
         sejarah_yayasan: data.data.sejarah_yayasan || '',
         visi_yayasan: data.data.visi_yayasan || '',
         misi_yayasan: data.data.misi_yayasan || '',
+        stat_kabupaten: data.data.stat_kabupaten || '38',
+        stat_sekolah: data.data.stat_sekolah || '500+',
+        stat_guru: data.data.stat_guru || '15.000+',
+        stat_siswa: data.data.stat_siswa || '100.000+',
         current_foto: data.data.foto_ketua || ''
       }));
     }
@@ -103,6 +111,10 @@ export default function AdminDashboard() {
     formData.append('sejarah_yayasan', settingsForm.sejarah_yayasan);
     formData.append('visi_yayasan', settingsForm.visi_yayasan);
     formData.append('misi_yayasan', settingsForm.misi_yayasan);
+    formData.append('stat_kabupaten', settingsForm.stat_kabupaten);
+    formData.append('stat_sekolah', settingsForm.stat_sekolah);
+    formData.append('stat_guru', settingsForm.stat_guru);
+    formData.append('stat_siswa', settingsForm.stat_siswa);
     if (settingsForm.foto_ketua) {
       formData.append('foto_ketua', settingsForm.foto_ketua);
     }
@@ -759,6 +771,59 @@ export default function AdminDashboard() {
                           placeholder="Teks sejarah singkat pembentukan yayasan..."
                           className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
                         ></textarea>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                      <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-yellow-600" />
+                        Pengaturan Statistik Beranda (Counter Data)
+                      </h3>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Kabupaten / Kota se-Jatim</label>
+                          <input
+                            type="text"
+                            value={settingsForm.stat_kabupaten}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, stat_kabupaten: e.target.value })}
+                            placeholder="Contoh: 38"
+                            className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Sekolah PGRI</label>
+                          <input
+                            type="text"
+                            value={settingsForm.stat_sekolah}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, stat_sekolah: e.target.value })}
+                            placeholder="Contoh: 500+"
+                            className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Guru & Pendidik</label>
+                          <input
+                            type="text"
+                            value={settingsForm.stat_guru}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, stat_guru: e.target.value })}
+                            placeholder="Contoh: 15.000+"
+                            className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Siswa & Peserta Didik</label>
+                          <input
+                            type="text"
+                            value={settingsForm.stat_siswa}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, stat_siswa: e.target.value })}
+                            placeholder="Contoh: 100.000+"
+                            className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                          />
+                        </div>
                       </div>
                     </div>
 
