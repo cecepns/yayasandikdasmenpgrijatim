@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck, BookOpen, FileText, Database, Plus, Search,
-  Trash2, Edit, CheckCircle, XCircle, Clock, Eye, AlertTriangle, Upload
+  Trash2, Edit, CheckCircle, XCircle, Clock, Eye, AlertTriangle, Upload,
+  UserCheck, Sparkles, Phone
 } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
