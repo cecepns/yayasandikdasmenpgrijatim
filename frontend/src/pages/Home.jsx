@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import heroImg from '../assets/hero-img.png';
+import heroImg from '../assets/hero-img.jpeg';
 import heroBg from '../assets/hero-bg.png';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
@@ -66,7 +66,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 
             {/* Left Content */}
-            <div className="lg:col-span-7 space-y-6 text-left" data-aos="fade-up">
+            <div className="lg:col-span-6 space-y-6 text-left" data-aos="fade-up">
 
               {/* Badge Tagline */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold">
@@ -84,25 +84,6 @@ export default function Home() {
               <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed font-normal max-w-2xl">
                 Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.
               </p>
-
-              {/* Action Buttons */}
-              {/* <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-                <Link
-                  to="/layanan/persuratan"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-red-700 hover:bg-red-800 text-white font-semibold text-sm shadow-md transition-all"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>Layanan Persuratan Online</span>
-                </Link>
-
-                <Link
-                  to="/layanan/sistem-informasi"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-sm border border-slate-200 transition-all"
-                >
-                  <Database className="w-4 h-4 text-yellow-600" />
-                  <span>Sistem Informasi Lembaga</span>
-                </Link>
-              </div> */}
 
               {/* Features Badges */}
               <div className="pt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm font-medium text-slate-600 border-t border-slate-100">
@@ -123,7 +104,7 @@ export default function Home() {
             </div>
 
             {/* Right Hero Image Visual (No Border, No Shadow) */}
-            <div className="lg:col-span-5" data-aos="fade-up" data-aos-delay="100">
+            <div className="lg:col-span-6" data-aos="fade-up" data-aos-delay="100">
               <div className="mx-auto max-w-lg bg-white border border-slate-50 rounded-xl overflow-hidden">
                 <img
                   src={heroImg}
