@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { BookOpen, Search, Calendar, User, ArrowRight } from 'lucide-react';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
