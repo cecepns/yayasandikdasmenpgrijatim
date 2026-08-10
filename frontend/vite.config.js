@@ -10,6 +10,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'logo.png'],
+      workbox: {
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
+        navigateFallbackDenylist: [/^\/api/]
+      },
       manifest: {
         name: 'Yayasan Dikdasmen PGRI Jawa Timur',
         short_name: 'Dikdasmen PGRI Jatim',
