@@ -69,15 +69,15 @@ export default function Home() {
             <div className="lg:col-span-7 space-y-6 text-left" data-aos="fade-up">
 
               {/* Badge Tagline */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-100 text-red-700 text-xs sm:text-sm font-semibold">
-                <Sparkles className="w-4 h-4 text-red-600 shrink-0" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Yayasan Dikdasmen PGRI Jawa Timur</span>
               </div>
 
               {/* Main Heading */}
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-snug sm:leading-tight">
                 Pendidikan Bermutu,<br className="hidden sm:inline" />
-                <span className="text-red-700"> Generasi Berkarakter</span>
+                <span className="text-emerald-800"> Generasi Berkarakter</span>
               </h1>
 
               {/* Subheading text */}
@@ -86,7 +86,7 @@ export default function Home() {
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              {/* <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <Link
                   to="/layanan/persuratan"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-red-700 hover:bg-red-800 text-white font-semibold text-sm shadow-md transition-all"
@@ -102,7 +102,7 @@ export default function Home() {
                   <Database className="w-4 h-4 text-yellow-600" />
                   <span>Sistem Informasi Lembaga</span>
                 </Link>
-              </div>
+              </div> */}
 
               {/* Features Badges */}
               <div className="pt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm font-medium text-slate-600 border-t border-slate-100">
@@ -143,7 +143,7 @@ export default function Home() {
           <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 grid grid-cols-1 lg:grid-cols-12" data-aos="fade-up">
 
             {/* Profil Ketua Sidebar */}
-            <div className="lg:col-span-4 bg-red-800 text-white p-8 sm:p-10 flex flex-col justify-between items-center text-center">
+            <div className="lg:col-span-4 bg-emerald-800 text-white p-8 sm:p-10 flex flex-col justify-between items-center text-center">
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 p-1 border-2 border-yellow-400 flex items-center justify-center mb-4 overflow-hidden">
                 {settings.foto_ketua ? (
                   <img
@@ -161,7 +161,7 @@ export default function Home() {
                   {settings.jabatan_ketua}
                 </p>
               </div>
-              <div className="mt-6 pt-6 border-t border-red-700/80 w-full text-xs text-red-100">
+              <div className="mt-6 pt-6 border-t border-emerald-700/80 w-full text-xs text-emerald-100">
                 Pengurus Wilayah Jawa Timur
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function Home() {
             {/* Kutipan Sambutan */}
             <div className="lg:col-span-8 p-6 sm:p-10 space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
-                <span className="text-xs font-bold text-red-700 uppercase tracking-wider bg-red-50 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full">
                   Kata Sambutan Ketua Yayasan
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
@@ -184,7 +184,7 @@ export default function Home() {
                 <span className="text-xs text-slate-500 font-medium">Assalamu'alaikum Warahmatullahi Wabarakatuh</span>
                 <Link
                   to="/sambutan"
-                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-red-700 hover:text-red-800 transition-colors"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-800 hover:text-emerald-900 transition-colors"
                 >
                   <span>Baca Sambutan Selengkapnya</span>
                   <ArrowRight className="w-4 h-4" />
@@ -201,7 +201,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-12" data-aos="fade-up">
-            <span className="text-xs font-bold text-red-700 uppercase tracking-wider bg-red-50 px-3 py-1 rounded-full border border-red-100">
+            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
               Makna & Filosofi
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
@@ -238,7 +238,7 @@ export default function Home() {
 
             {/* Unsur 3 */}
             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200/80 hover:bg-white hover:shadow-md transition-all space-y-3" data-aos="fade-up" data-aos-delay="200">
-              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-800 flex items-center justify-center font-bold text-sm">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-sm">
                 3
               </div>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">Nyala Api (5 Sinar)</h3>
@@ -267,7 +267,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-12" data-aos="fade-up">
-            <span className="text-xs font-bold text-red-700 uppercase tracking-wider bg-red-100/70 px-3 py-1 rounded-full">
+            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-100/70 px-3 py-1 rounded-full">
               Layanan Digital
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
@@ -281,8 +281,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
 
             {/* Service 1: Persuratan */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4 hover:border-red-200 transition-all" data-aos="fade-up">
-              <div className="w-12 h-12 rounded-2xl bg-red-700 text-white flex items-center justify-center">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4 hover:border-emerald-200 transition-all" data-aos="fade-up">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-800 text-white flex items-center justify-center">
                 <FileText className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Layanan Persuratan Online</h3>
@@ -292,7 +292,7 @@ export default function Home() {
               <div className="pt-2">
                 <Link
                   to="/layanan/persuratan"
-                  className="inline-flex items-center gap-2 font-bold text-red-700 hover:text-red-800 text-sm"
+                  className="inline-flex items-center gap-2 font-bold text-emerald-800 hover:text-emerald-900 text-sm"
                 >
                   <span>Akses Form & Lacak Surat</span>
                   <ArrowRight className="w-4 h-4" />

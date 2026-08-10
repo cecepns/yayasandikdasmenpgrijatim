@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ShieldCheck, FileText, Database, BookOpen, LogOut, Menu, X, ArrowLeft, UserCheck, Users, Settings } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShieldCheck, FileText, Database, BookOpen, LogOut, Menu, X, ArrowLeft, Users, Settings } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-export default function AdminSidebar({ activeTab, setActiveTab, onLogout }) {
+export default function AdminSidebar({ activeTab }) {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
-    { id: 'berita', label: 'Kelola Berita', icon: BookOpen },
-    { id: 'persuratan', label: 'Layanan Persuratan', icon: FileText },
-    { id: 'lembaga', label: 'Data Lembaga (SIL)', icon: Database },
-    { id: 'pengurus', label: 'Pengurus Yayasan', icon: Users },
-    { id: 'settings', label: 'Profil & Sambutan', icon: Settings },
+    { id: 'berita', path: '/admin/berita', label: 'Kelola Berita', icon: BookOpen },
+    { id: 'persuratan', path: '/admin/persuratan', label: 'Layanan Persuratan', icon: FileText },
+    { id: 'sistem-informasi', path: '/admin/sistem-informasi', label: 'Data Lembaga (SIL)', icon: Database },
+    { id: 'pengurus', path: '/admin/pengurus', label: 'Pengurus Yayasan', icon: Users },
+    { id: 'settings', path: '/admin/settings', label: 'Profil & Sambutan', icon: Settings },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    toast.success('Berhasil keluar dari Panel Admin');
+    navigate('/admin/login', { replace: true });
+  };
+
+  const currentTab = activeTab || location.pathname.split('/')[2] || 'berita';
 
   return (
     <>
@@ -51,12 +62,12 @@ export default function AdminSidebar({ activeTab, setActiveTab, onLogout }) {
             </div>
             {menuItems.map(item => {
               const Icon = item.icon;
-              const isSelected = activeTab === item.id;
+              const isSelected = currentTab === item.id || location.pathname === item.path;
               return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    navigate(item.path);
                     setCollapsed(false);
                   }}
                   className={`
@@ -84,7 +95,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, onLogout }) {
             <span>Kembali ke Website</span>
           </Link>
           <button
-            onClick={onLogout}
+            onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl font-medium text-sm text-red-400 hover:text-white hover:bg-red-900/40 transition-colors"
           >
             <LogOut className="w-4 h-4" />

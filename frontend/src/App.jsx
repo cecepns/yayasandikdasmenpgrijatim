@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import Navbar from './components/Navbar';
@@ -14,6 +14,7 @@ import BeritaPage from './pages/BeritaPage';
 import BeritaDetailPage from './pages/BeritaDetailPage';
 import KontakPage from './pages/KontakPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLoginPage from './pages/AdminLoginPage';
 
 // Helper to reset scroll position to top (0, 0) on route change
 function ScrollToTop() {
@@ -32,8 +33,10 @@ export default function App() {
       <ScrollToTop />
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-        {/* Admin Dashboard Route without main Navbar & Footer */}
-        <Route path="/admin" element={<AdminDashboard />} />
+        {/* Dedicated Admin Routes (Without Main Navbar & Footer) */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<Navigate to="/admin/berita" replace />} />
+        <Route path="/admin/:tab" element={<AdminDashboard />} />
 
         {/* Public Routes with Navbar and Footer */}
         <Route

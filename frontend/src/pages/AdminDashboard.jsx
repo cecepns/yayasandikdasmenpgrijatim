@@ -7,6 +7,7 @@ import {
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
@@ -16,13 +17,24 @@ import { requestHandler } from '../utils/request';
 import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
-  // Auth state
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { tab } = useParams();
+  const navigate = useNavigate();
+
+  // Auth state initialized from localStorage token
+  const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(localStorage.getItem('adminToken')));
   const [loginForm, setLoginForm] = useState({ username: 'admin', password: '' });
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Current Admin Tab ('berita' | 'persuratan' | 'lembaga')
-  const [activeTab, setActiveTab] = useState('berita');
+  // Derive activeTab from route params (e.g. /admin/berita, /admin/persuratan, /admin/sistem-informasi)
+  const tabParamMap = {
+    'berita': 'berita',
+    'persuratan': 'persuratan',
+    'sistem-informasi': 'lembaga',
+    'lembaga': 'lembaga',
+    'pengurus': 'pengurus',
+    'settings': 'settings'
+  };
+  const activeTab = tabParamMap[tab] || 'berita';
 
   // Shared Data & State
   const [items, setItems] = useState([]);
@@ -314,60 +326,13 @@ export default function AdminDashboard() {
       toast.success(editItem ? 'Data lembaga diperbarui' : 'Data lembaga berhasil ditambahkan');
       setIsModalOpen(false);
       loadTabData('lembaga', pagination.page, pagination.limit, debouncedSearch);
+      // AUTH CHECK: If not authenticated, redirect to /admin/login
     }
   };
 
-  // LOGIN SCREEN
+  // AUTH CHECK: If not authenticated, redirect to /admin/login
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6">
-          <div className="text-center space-y-2">
-            <img src="/logo.png" alt="Logo PGRI" className="h-16 w-auto mx-auto" />
-            <h1 className="text-2xl font-extrabold text-slate-900">Portal Admin Yayasan</h1>
-            <p className="text-xs text-slate-500 font-medium">Dikdasmen PGRI Jawa Timur</p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Username</label>
-              <input
-                type="text"
-                value={loginForm.username}
-                onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                required
-                className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Password</label>
-              <input
-                type="password"
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                required
-                placeholder="Masukkan password admin (admin123)"
-                className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-600 focus:border-red-600 bg-white text-sm"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loginLoading}
-              className="w-full py-3.5 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-700/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-5 h-5" />
-              <span>{loginLoading ? 'Memeriksa Access...' : 'Masuk ke Portal Admin'}</span>
-            </button>
-          </form>
-
-          <div className="p-3 bg-red-50 rounded-xl border border-red-100 text-xs text-slate-600 text-center">
-            Demo Credentials: Username <strong className="text-red-700">admin</strong> / Password <strong className="text-red-700">admin123</strong>
-          </div>
-        </div>
-      </div>
-    );
+    return <Navigate to="/admin/login" replace />;
   }
 
   // MAIN ADMIN DASHBOARD LAYOUT
