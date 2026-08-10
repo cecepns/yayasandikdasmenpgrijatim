@@ -93,7 +93,7 @@ export default function ProfilPage() {
                 Sayap Bulu (5 Helai)
               </div>
               <h3 className="font-bold text-slate-900 text-base">Makna Sayap Bulu (Kuning)</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 Masing-masing 5 helai di kiri dan kanan berwarna kuning: Melambangkan cita-cita setinggi angkasa di bidang pendidikan yang berlandaskan Pancasila untuk mengantar generasi muda ke masa depan yang cerah.
               </p>
             </div>
@@ -105,7 +105,7 @@ export default function ProfilPage() {
                 Suluh Tegak (4 Garis)
               </div>
               <h3 className="font-bold text-slate-900 text-base">Makna Suluh Berdiri Tegak (Kuning)</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 Suluh berdiri tegak dengan 4 garis berwarna kuning: Melambangkan fungsi guru pada empat tingkat pendidikan (pra-sekolah/pendidikan anak usia dini, tingkat dasar, tingkat menengah, dan perguruan tinggi) serta luhurnya tugas pengabdian pendidik.
               </p>
             </div>
@@ -117,7 +117,7 @@ export default function ProfilPage() {
                 Nyala Api (5 Sinar)
               </div>
               <h3 className="font-bold text-slate-900 text-base">Makna Nyala Api (Merah)</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 Nyala api dengan 5 sinar berwarna merah: Melambangkan semangat pengabdian serta pancaran nilai-nilai luhur Pancasila dalam mendidik bangsa.
               </p>
             </div>
@@ -129,7 +129,7 @@ export default function ProfilPage() {
                 Tali Hijau Melingkar
               </div>
               <h3 className="font-bold text-slate-900 text-base">Makna Tali Hijau Melingkar</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 Tali hijau melingkar: Melambangkan persaudaraan dan pengabdian yang dilandasi kesucian, cinta kasih, kemurnian, keberanian, serta kesetiaan kepada negara dan bangsa Indonesia.
               </p>
             </div>

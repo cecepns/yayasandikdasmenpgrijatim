@@ -199,7 +199,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               Arti Lambang Yayasan Dikdasmen PGRI Jatim
             </h2>
-            <p className="text-slate-600 text-xs sm:text-sm">
+            <p className="text-slate-600 text-sm sm:text-base">
               Unsur-unsur utama lambang melambangkan pengabdian mulia dunia pendidikan yang berlandaskan Pancasila.
             </p>
           </div>
@@ -212,7 +212,7 @@ export default function Home() {
                 1
               </div>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">Sayap Bulu (5 Helai)</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Masing-masing 5 helai di kiri & kanan berwarna kuning. Melambangkan cita-cita setinggi angkasa di bidang pendidikan berlandaskan Pancasila.
               </p>
             </div>
@@ -223,7 +223,7 @@ export default function Home() {
                 2
               </div>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">Suluh Tegak (4 Garis)</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Melambangkan fungsi guru pada empat tingkat pendidikan (PAUD/Pra-sekolah, Dasar, Menengah, dan Perguruan Tinggi).
               </p>
             </div>
@@ -234,7 +234,7 @@ export default function Home() {
                 3
               </div>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">Nyala Api (5 Sinar)</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Warna merah melambangkan semangat pengabdian serta pancaran nilai-nilai luhur Pancasila dalam mendidik bangsa.
               </p>
             </div>
@@ -245,7 +245,7 @@ export default function Home() {
                 4
               </div>
               <h3 className="font-bold text-slate-900 text-sm sm:text-base">Tali Hijau Melingkar</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Melambangkan persaudaraan dan pengabdian yang dilandasi kesucian, kemurnian, keberanian, serta kesetiaan kepada NKRI.
               </p>
             </div>
@@ -265,7 +265,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               Layanan Utama Yayasan Dikdasmen
             </h2>
-            <p className="text-slate-600 text-xs sm:text-sm">
+            <p className="text-slate-600 text-sm sm:text-base">
               Sistem persuratan online & direktori sekolah PGRI di Jawa Timur.
             </p>
           </div>
@@ -278,13 +278,13 @@ export default function Home() {
                 <FileText className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Layanan Persuratan Online</h3>
-              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
                 Pengajuan rekomendasi yayasan, pengantar mutasi, permohonan izin operasional, serta verifikasi dan pelacakan resi surat secara transparan.
               </p>
               <div className="pt-2">
                 <Link
                   to="/layanan/persuratan"
-                  className="inline-flex items-center gap-2 font-bold text-red-700 hover:text-red-800 text-xs sm:text-sm"
+                  className="inline-flex items-center gap-2 font-bold text-red-700 hover:text-red-800 text-sm"
                 >
                   <span>Akses Form & Lacak Surat</span>
                   <ArrowRight className="w-4 h-4" />
@@ -298,7 +298,7 @@ export default function Home() {
                 <Database className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Sistem Informasi Lembaga (SIL)</h3>
-              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
                 Direktori data sekolah PGRI di Jawa Timur (NPSN, jumlah siswa & guru, akreditasi, serta kontak sekolah) dari jenjang PAUD, SD, SMP, SMA/SMK.
               </p>
               <div className="pt-2">
