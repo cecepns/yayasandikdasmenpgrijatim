@@ -149,12 +149,12 @@ export default function Home() {
 
             {/* Profil Ketua Sidebar */}
             <div className="lg:col-span-4 bg-emerald-800 text-white p-8 sm:p-10 flex flex-col justify-between items-center text-center">
-              <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl bg-white/10 p-1.5 border-2 border-yellow-400 flex items-center justify-center mb-4 overflow-hidden shadow-md">
+              <div className="w-36 h-44 sm:w-40 sm:h-48 rounded-2xl bg-white/10 p-1.5 border-2 border-yellow-400 flex items-center justify-center mb-4 overflow-hidden shadow-md">
                 {settings.foto_ketua ? (
                   <img
                     src={getImageUrl(settings.foto_ketua)}
                     alt={settings.nama_ketua}
-                    className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover object-top rounded-xl"
                   />
                 ) : (
                   <GraduationCap className="w-14 h-14 text-yellow-300" />

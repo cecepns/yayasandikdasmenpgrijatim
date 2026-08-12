@@ -47,12 +47,12 @@ export default function SambutanPage() {
             Kata Sambutan Ketua Yayasan Dikdasmen PGRI Jawa Timur
           </h1>
           <div className="flex items-center justify-center gap-3 pt-2">
-            <div className="w-20 h-20 rounded-2xl bg-red-700 text-white flex items-center justify-center font-bold text-lg overflow-hidden border-2 border-yellow-400 shadow-md">
+            <div className="w-24 h-32 rounded-2xl bg-red-700 text-white flex items-center justify-center font-bold text-lg overflow-hidden border-2 border-yellow-400 shadow-md">
               {settings.foto_ketua ? (
                 <img
                   src={getImageUrl(settings.foto_ketua)}
                   alt={settings.nama_ketua}
-                  className="w-full h-full object-cover rounded-xl"
+                  className="w-full h-full object-cover object-top rounded-xl"
                 />
               ) : (
                 <GraduationCap className="w-10 h-10 text-yellow-300" />

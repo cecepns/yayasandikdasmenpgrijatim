@@ -140,10 +140,10 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
                       <img
                         src={getImageUrl(p.foto)}
                         alt={p.nama}
-                        className="w-24 h-24 rounded-2xl object-cover mx-auto shadow-md border-2 border-red-700"
+                        className="w-28 h-36 rounded-2xl object-cover object-top mx-auto shadow-md border-2 border-red-700"
                       />
                     ) : (
-                      <div className="w-20 h-20 rounded-2xl bg-red-100 text-red-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner border border-red-200">
+                      <div className="w-24 h-28 rounded-2xl bg-red-100 text-red-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner border border-red-200">
                         {initials}
                       </div>
                     )}
