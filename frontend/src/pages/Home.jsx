@@ -15,6 +15,11 @@ import { getImageUrl } from '../utils/image';
 
 export default function Home() {
   const [settings, setSettings] = useState({
+    hero_title: 'Pendidikan Bermutu, Generasi Berkarakter',
+    hero_subtitle: 'Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.',
+    hero_image: null,
+    title_sambutan_home: 'Selamat Datang di Website Resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur',
+    quote_sambutan_home: 'Kami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, serta mendukung profesionalisme pendidik.',
     nama_ketua: 'Drs. H. Winadi, M.Pd',
     jabatan_ketua: 'Ketua Yayasan Dikdasmen PGRI Jatim',
     foto_ketua: null,
@@ -41,6 +46,11 @@ export default function Home() {
     if (!error && data?.data) {
       setSettings(prev => ({
         ...prev,
+        hero_title: data.data.hero_title || prev.hero_title,
+        hero_subtitle: data.data.hero_subtitle || prev.hero_subtitle,
+        hero_image: data.data.hero_image || null,
+        title_sambutan_home: data.data.title_sambutan_home || prev.title_sambutan_home,
+        quote_sambutan_home: data.data.quote_sambutan_home || prev.quote_sambutan_home,
         nama_ketua: data.data.nama_ketua || prev.nama_ketua,
         jabatan_ketua: data.data.jabatan_ketua || prev.jabatan_ketua,
         foto_ketua: data.data.foto_ketua || null,
@@ -90,14 +100,13 @@ export default function Home() {
               </div>
 
               {/* Main Heading */}
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-snug sm:leading-tight">
-                Pendidikan Bermutu,<br className="hidden sm:inline" />
-                <span className="text-emerald-800"> Generasi Berkarakter</span>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-snug sm:leading-tight whitespace-pre-line">
+                {settings.hero_title}
               </h1>
 
               {/* Subheading text */}
               <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed font-normal max-w-2xl">
-                Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.
+                {settings.hero_subtitle}
               </p>
 
               {/* Features Badges */}
@@ -122,7 +131,7 @@ export default function Home() {
             <div className="lg:col-span-6" data-aos="fade-up" data-aos-delay="100">
               <div className="mx-auto max-w-lg bg-white border border-slate-50 rounded-xl overflow-hidden">
                 <img
-                  src={heroImg}
+                  src={settings.hero_image ? getImageUrl(settings.hero_image) : heroImg}
                   alt="Yayasan Dikdasmen PGRI Jawa Timur"
                   className="w-full h-auto object-contain"
                 />
@@ -169,10 +178,10 @@ export default function Home() {
                   Kata Sambutan Ketua Yayasan
                 </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
-                  Selamat Datang di Website Resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur
+                  {settings.title_sambutan_home}
                 </h2>
                 <p className="text-slate-600 text-xs sm:text-sm lg:text-base leading-relaxed italic">
-                  "Kami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, serta mendukung profesionalisme pendidik."
+                  "{settings.quote_sambutan_home}"
                 </p>
               </div>
 

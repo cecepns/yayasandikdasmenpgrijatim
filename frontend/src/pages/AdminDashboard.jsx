@@ -59,6 +59,12 @@ export default function AdminDashboard() {
     nama: '', jabatan: '', kategori: 'Pengurus Harian', deskripsi: '', urutan: 1, foto: null
   });
   const [settingsForm, setSettingsForm] = useState({
+    hero_title: 'Pendidikan Bermutu, Generasi Berkarakter',
+    hero_subtitle: 'Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.',
+    hero_image: null,
+    current_hero_image: '',
+    title_sambutan_home: 'Selamat Datang di Website Resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur',
+    quote_sambutan_home: 'Kami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, serta mendukung profesionalisme pendidik.',
     nama_ketua: 'Drs. H. Winadi, M.Pd',
     jabatan_ketua: 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
     sambutan_ketua: '',
@@ -105,6 +111,11 @@ export default function AdminDashboard() {
     if (!error && data?.data) {
       setSettingsForm(prev => ({
         ...prev,
+        hero_title: data.data.hero_title || 'Pendidikan Bermutu, Generasi Berkarakter',
+        hero_subtitle: data.data.hero_subtitle || 'Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.',
+        current_hero_image: data.data.hero_image || '',
+        title_sambutan_home: data.data.title_sambutan_home || 'Selamat Datang di Website Resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur',
+        quote_sambutan_home: data.data.quote_sambutan_home || 'Kami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, serta mendukung profesionalisme pendidik.',
         nama_ketua: data.data.nama_ketua || 'Drs. H. Winadi, M.Pd',
         jabatan_ketua: data.data.jabatan_ketua || 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
         sambutan_ketua: data.data.sambutan_ketua || '',
@@ -129,6 +140,10 @@ export default function AdminDashboard() {
     e.preventDefault();
     setSettingsLoading(true);
     const formData = new FormData();
+    formData.append('hero_title', settingsForm.hero_title);
+    formData.append('hero_subtitle', settingsForm.hero_subtitle);
+    formData.append('title_sambutan_home', settingsForm.title_sambutan_home);
+    formData.append('quote_sambutan_home', settingsForm.quote_sambutan_home);
     formData.append('nama_ketua', settingsForm.nama_ketua);
     formData.append('jabatan_ketua', settingsForm.jabatan_ketua);
     formData.append('sambutan_ketua', settingsForm.sambutan_ketua);
@@ -147,6 +162,9 @@ export default function AdminDashboard() {
     if (settingsForm.foto_ketua) {
       formData.append('foto_ketua', settingsForm.foto_ketua);
     }
+    if (settingsForm.hero_image) {
+      formData.append('hero_image', settingsForm.hero_image);
+    }
 
     const { data, error } = await requestHandler(() =>
       api.put(API_ENDPOINTS.SETTINGS.UPDATE, formData, {
@@ -158,9 +176,13 @@ export default function AdminDashboard() {
     if (error) {
       toast.error('Gagal memperbarui profil yayasan');
     } else {
-      toast.success('Profil & Sambutan Yayasan berhasil disimpan!');
-      if (data?.data?.foto_ketua) {
-        setSettingsForm(prev => ({ ...prev, current_foto: data.data.foto_ketua }));
+      toast.success('Profil, Hero & Sambutan Yayasan berhasil disimpan!');
+      if (data?.data) {
+        setSettingsForm(prev => ({
+          ...prev,
+          ...(data.data.foto_ketua ? { current_foto: data.data.foto_ketua } : {}),
+          ...(data.data.hero_image ? { current_hero_image: data.data.hero_image } : {})
+        }));
       }
     }
   };
@@ -653,11 +675,90 @@ export default function AdminDashboard() {
               {activeTab === 'settings' && (
                 <div className="p-8 max-w-3xl space-y-8">
                   <form onSubmit={handleSaveSettings} className="space-y-6">
+                    {/* Hero Section Settings */}
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                      <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-emerald-700" />
+                        Pengaturan Banner Beranda (Hero Section)
+                      </h3>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Judul Hero (Title Utama) *</label>
+                        <input
+                          type="text"
+                          value={settingsForm.hero_title}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, hero_title: e.target.value })}
+                          required
+                          placeholder="Pendidikan Bermutu, Generasi Berkarakter"
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white font-semibold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Subjudul / Deskripsi Hero *</label>
+                        <textarea
+                          rows={3}
+                          value={settingsForm.hero_subtitle}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, hero_subtitle: e.target.value })}
+                          required
+                          placeholder="Website resmi Yayasan Pembina Lembaga Pendidikan Dasar..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        ></textarea>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Upload Gambar Hero Visual Beranda</label>
+                        {settingsForm.current_hero_image && (
+                          <div className="flex items-center gap-4 mb-4 p-3 bg-white border border-slate-200 rounded-2xl">
+                            <img
+                              src={getImageUrl(settingsForm.current_hero_image)}
+                              alt="Gambar Hero Beranda saat ini"
+                              className="w-24 h-16 object-cover rounded-xl border border-slate-200"
+                            />
+                            <div className="text-xs text-slate-600">
+                              <span className="font-semibold block text-slate-900">Gambar Hero Saat Ini</span>
+                              <span>Akan diganti jika Anda mengunggah berkas baru.</span>
+                            </div>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setSettingsForm({ ...settingsForm, hero_image: e.target.files[0] })}
+                          className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-800 hover:file:bg-emerald-100 border border-slate-300 rounded-xl p-1 bg-white"
+                        />
+                      </div>
+                    </div>
+
                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
                       <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
                         <UserCheck className="w-5 h-5 text-red-700" />
-                        Pengaturan Profil Ketua Yayasan
+                        Pengaturan Profil & Sambutan Ketua Yayasan (Beranda)
                       </h3>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Judul Sambutan Beranda *</label>
+                        <input
+                          type="text"
+                          value={settingsForm.title_sambutan_home}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, title_sambutan_home: e.target.value })}
+                          required
+                          placeholder="Selamat Datang di Website Resmi Yayasan..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Ringkasan Kutipan Sambutan Beranda *</label>
+                        <textarea
+                          rows={4}
+                          value={settingsForm.quote_sambutan_home}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, quote_sambutan_home: e.target.value })}
+                          required
+                          placeholder="Kami meyakini bahwa pendidikan merupakan fondasi utama..."
+                          className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white italic"
+                        ></textarea>
+                      </div>
 
                       <div>
                         <label className="block text-xs font-bold uppercase text-slate-700 mb-2">Nama Ketua Yayasan *</label>

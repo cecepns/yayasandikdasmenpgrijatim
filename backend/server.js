@@ -764,6 +764,11 @@ app.delete('/api/pengurus/:id', async (req, res) => {
 });
 
 memoryDatabase.settings = {
+  hero_title: 'Pendidikan Bermutu, Generasi Berkarakter',
+  hero_subtitle: 'Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.',
+  hero_image: null,
+  title_sambutan_home: 'Selamat Datang di Website Resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur',
+  quote_sambutan_home: 'Kami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, serta mendukung profesionalisme pendidik.',
   nama_ketua: 'Drs. H. Winadi, M.Pd',
   jabatan_ketua: 'Ketua Yayasan Dikdasmen PGRI Jawa Timur',
   foto_ketua: null,
@@ -818,17 +823,24 @@ app.get('/api/settings', async (req, res) => {
   return res.json({ success: true, data: memoryDatabase.settings });
 });
 
-app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
+app.put('/api/settings', upload.fields([{ name: 'foto_ketua', maxCount: 1 }, { name: 'hero_image', maxCount: 1 }]), async (req, res) => {
   const {
+    hero_title, hero_subtitle, title_sambutan_home, quote_sambutan_home,
     nama_ketua, jabatan_ketua, sambutan_ketua, sejarah_yayasan, visi_yayasan, misi_yayasan,
     stat_kabupaten, stat_sekolah, stat_guru, stat_siswa,
     alamat_yayasan, telepon_yayasan, email_yayasan, website_yayasan, jam_operasional
   } = req.body;
-  let foto_ketua = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+  let foto_ketua = req.files && req.files['foto_ketua'] ? `/uploads/${req.files['foto_ketua'][0].filename}` : undefined;
+  let hero_image = req.files && req.files['hero_image'] ? `/uploads/${req.files['hero_image'][0].filename}` : undefined;
 
   const pool = await getDbConnection();
   if (pool) {
     try {
+      if (hero_title) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['hero_title', hero_title, hero_title]);
+      if (hero_subtitle) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['hero_subtitle', hero_subtitle, hero_subtitle]);
+      if (title_sambutan_home) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['title_sambutan_home', title_sambutan_home, title_sambutan_home]);
+      if (quote_sambutan_home) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['quote_sambutan_home', quote_sambutan_home, quote_sambutan_home]);
       if (nama_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['nama_ketua', nama_ketua, nama_ketua]);
       if (jabatan_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['jabatan_ketua', jabatan_ketua, jabatan_ketua]);
       if (sambutan_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['sambutan_ketua', sambutan_ketua, sambutan_ketua]);
@@ -845,6 +857,7 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
       if (website_yayasan) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['website_yayasan', website_yayasan, website_yayasan]);
       if (jam_operasional) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['jam_operasional', jam_operasional, jam_operasional]);
       if (foto_ketua) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['foto_ketua', foto_ketua, foto_ketua]);
+      if (hero_image) await pool.query('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?', ['hero_image', hero_image, hero_image]);
 
       const [rows] = await pool.query('SELECT * FROM settings');
       const settingsObj = {};
@@ -853,6 +866,10 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
     } catch (e) { console.error(e); }
   }
 
+  if (hero_title) memoryDatabase.settings.hero_title = hero_title;
+  if (hero_subtitle) memoryDatabase.settings.hero_subtitle = hero_subtitle;
+  if (title_sambutan_home) memoryDatabase.settings.title_sambutan_home = title_sambutan_home;
+  if (quote_sambutan_home) memoryDatabase.settings.quote_sambutan_home = quote_sambutan_home;
   if (nama_ketua) memoryDatabase.settings.nama_ketua = nama_ketua;
   if (jabatan_ketua) memoryDatabase.settings.jabatan_ketua = jabatan_ketua;
   if (sambutan_ketua) memoryDatabase.settings.sambutan_ketua = sambutan_ketua;
@@ -869,6 +886,7 @@ app.put('/api/settings', upload.single('foto_ketua'), async (req, res) => {
   if (website_yayasan) memoryDatabase.settings.website_yayasan = website_yayasan;
   if (jam_operasional) memoryDatabase.settings.jam_operasional = jam_operasional;
   if (foto_ketua) memoryDatabase.settings.foto_ketua = foto_ketua;
+  if (hero_image) memoryDatabase.settings.hero_image = hero_image;
 
   res.json({ success: true, message: 'Pengaturan Profil & Kontak Yayasan berhasil diperbarui', data: memoryDatabase.settings });
 });

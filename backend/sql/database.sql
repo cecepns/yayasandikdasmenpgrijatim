@@ -93,6 +93,11 @@ CREATE TABLE IF NOT EXISTS `settings` (
 );
 
 INSERT INTO `settings` (`key`, `value`) VALUES
+('hero_title', 'Pendidikan Bermutu, Generasi Berkarakter'),
+('hero_subtitle', 'Website resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur sebagai sarana informasi, digitalisasi persuratan, dan integrasi lembaga sekolah se-Jawa Timur.'),
+('hero_image', NULL),
+('title_sambutan_home', 'Selamat Datang di Website Resmi Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur'),
+('quote_sambutan_home', 'Kami meyakini bahwa pendidikan merupakan fondasi utama dalam membangun sumber daya manusia yang unggul, berkarakter, berintegritas, serta mampu menjawab tantangan zaman. Yayasan Pembina Lembaga Dikdasmen PGRI Jawa Timur berkomitmen untuk terus meningkatkan mutu tata kelola yayasan, memperkuat kualitas layanan pendidikan, serta mendukung profesionalisme pendidik.'),
 ('nama_ketua', 'Drs. H. Winadi, M.Pd'),
 ('jabatan_ketua', 'Ketua Yayasan Dikdasmen PGRI Jawa Timur'),
 ('foto_ketua', NULL),
