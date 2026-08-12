@@ -570,6 +570,7 @@ export default function AdminDashboard() {
                       <th className="py-3 px-4">Jenjang & Wilayah</th>
                       <th className="py-3 px-4">Alamat & Kontak</th>
                       <th className="py-3 px-4">Kepala Sekolah</th>
+                      <th className="py-3 px-4 text-center">Siswa / Guru</th>
                       <th className="py-3 px-4 text-center">Akreditasi</th>
                       <th className="py-3 px-4 text-center">Aksi</th>
                     </tr>
@@ -590,6 +591,9 @@ export default function AdminDashboard() {
                           <div className="text-slate-500 font-mono text-[11px]">{item.kontak || '-'}</div>
                         </td>
                         <td className="py-4 px-4 text-xs font-semibold text-slate-700">{item.kepala_sekolah}</td>
+                        <td className="py-4 px-4 text-center text-xs">
+                          <span className="font-bold text-slate-800">{item.jumlah_siswa || 0}</span> Siswa / <span className="font-bold text-slate-800">{item.jumlah_guru || 0}</span> Guru
+                        </td>
                         <td className="py-4 px-4 text-center">
                           <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded text-xs">
                             {item.akreditasi}
@@ -1296,6 +1300,31 @@ export default function AdminDashboard() {
                   type="text"
                   value={lembagaForm.akreditasi}
                   onChange={(e) => setLembagaForm({ ...lembagaForm, akreditasi: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-300 text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Jumlah Siswa Aktif</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={lembagaForm.jumlah_siswa}
+                  onChange={(e) => setLembagaForm({ ...lembagaForm, jumlah_siswa: e.target.value })}
+                  placeholder="Contoh: 450"
+                  className="w-full p-2.5 rounded-xl border border-slate-300 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Jumlah Guru & Tendik</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={lembagaForm.jumlah_guru}
+                  onChange={(e) => setLembagaForm({ ...lembagaForm, jumlah_guru: e.target.value })}
+                  placeholder="Contoh: 32"
                   className="w-full p-2.5 rounded-xl border border-slate-300 text-sm"
                 />
               </div>
