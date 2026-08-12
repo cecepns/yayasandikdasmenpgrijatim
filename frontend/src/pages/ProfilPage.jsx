@@ -48,7 +48,9 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
         ...prev,
         visi: s.visi_yayasan || prev.visi,
         misi: s.misi_yayasan ? s.misi_yayasan.split('\n').filter(Boolean) : prev.misi,
-        sejarah: s.sejarah_yayasan || prev.sejarah
+        sejarah: s.sejarah_yayasan || prev.sejarah,
+        logo_lambang: s.logo_lambang || null,
+        lambang_desc: s.lambang_desc || ''
       }));
     }
 
@@ -138,10 +140,10 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
                       <img
                         src={getImageUrl(p.foto)}
                         alt={p.nama}
-                        className="w-20 h-20 rounded-full object-cover mx-auto shadow-md border-2 border-red-700"
+                        className="w-24 h-24 rounded-2xl object-cover mx-auto shadow-md border-2 border-red-700"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner">
+                      <div className="w-20 h-20 rounded-2xl bg-red-100 text-red-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner border border-red-200">
                         {initials}
                       </div>
                     )}
@@ -161,7 +163,7 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
             ) : (
               <>
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3">
-                  <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-20 h-20 rounded-2xl bg-red-100 text-red-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner border border-red-200">
                     KW
                   </div>
                   <h3 className="font-bold text-slate-900 text-lg">Drs. H. Winadi, M.Pd</h3>
@@ -170,7 +172,7 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
                 </div>
 
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-20 h-20 rounded-2xl bg-blue-100 text-blue-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner border border-blue-200">
                     DS
                   </div>
                   <h3 className="font-bold text-slate-900 text-lg">Drs. Supriyanto, M.Pd</h3>
@@ -179,7 +181,7 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
                 </div>
 
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3">
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-20 h-20 rounded-2xl bg-emerald-100 text-emerald-700 font-bold text-xl flex items-center justify-center mx-auto shadow-inner border border-emerald-200">
                     BS
                   </div>
                   <h3 className="font-bold text-slate-900 text-lg">H. Budi Santoso, SE, M.M</h3>
@@ -228,16 +230,25 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
         {/* 4. LAMBANG YAYASAN */}
         <section id="lambang" className="scroll-mt-28 space-y-8" data-aos="fade-up">
           <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-8 lg:p-12 space-y-10">
-            <div className="max-w-3xl space-y-2">
-              <span className="text-xs font-bold text-red-700 uppercase tracking-wider bg-red-100/70 px-3 py-1 rounded-full">
-                Identitas Kebangsaan
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                Lambang Yayasan & Makna Filosofis
-              </h2>
-              <p className="text-slate-600 text-sm sm:text-base">
-                Lambang Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur memiliki unsur utama berupa sayap bulu, suluh obor, serta warna dasar yang melambangkan pengabdian mulia dunia pendidikan.
-              </p>
+            <div className="flex flex-col md:flex-row items-center gap-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 shrink-0 p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center shadow-inner">
+                <img
+                  src={profileData.logo_lambang ? getImageUrl(profileData.logo_lambang) : "/logo.png"}
+                  alt="Logo Resmi Yayasan Dikdasmen PGRI Jatim"
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-red-700 uppercase tracking-wider bg-red-100/70 px-3 py-1 rounded-full">
+                  Identitas Kebangsaan
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                  Lambang Yayasan & Makna Filosofis
+                </h2>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                  {profileData.lambang_desc || 'Lambang Resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur memiliki unsur utama berupa sayap bulu, suluh obor, serta warna dasar yang melambangkan pengabdian mulia dunia pendidikan.'}
+                </p>
+              </div>
             </div>
 
             {/* Grid Unsur */}

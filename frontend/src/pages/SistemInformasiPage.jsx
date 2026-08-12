@@ -135,8 +135,8 @@ export default function SistemInformasiPage() {
                 <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                   <tr>
                     <th className="py-4 px-6">NPSN & Nama Sekolah</th>
-                    <th className="py-4 px-4">Jenjang</th>
-                    <th className="py-4 px-4">Wilayah (Kab/Kota)</th>
+                    <th className="py-4 px-4">Jenjang & Wilayah</th>
+                    <th className="py-4 px-4">Alamat & Kontak</th>
                     <th className="py-4 px-4">Kepala Sekolah</th>
                     <th className="py-4 px-4 text-center">Siswa / Guru</th>
                     <th className="py-4 px-4 text-center">Akreditasi</th>
@@ -150,15 +150,22 @@ export default function SistemInformasiPage() {
                         <div className="text-xs text-slate-500">NPSN: <span className="font-mono">{item.npsn}</span></div>
                       </td>
                       <td className="py-4 px-4">
-                        <span className="inline-block px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                        <span className="inline-block px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold mb-1">
                           {item.jenjang}
                         </span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-1.5 text-xs text-slate-700">
+                        <div className="flex items-center gap-1 text-xs text-slate-600">
                           <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
                           <span>{item.kabupaten_kota}</span>
                         </div>
+                      </td>
+                      <td className="py-4 px-4 text-xs text-slate-600 max-w-xs">
+                        <div className="font-medium text-slate-800 leading-snug">{item.alamat || '-'}</div>
+                        {item.kontak && (
+                          <div className="flex items-center gap-1 text-slate-500 font-mono text-[11px] mt-1">
+                            <Phone className="w-3 h-3 text-emerald-600 shrink-0" />
+                            <span>{item.kontak}</span>
+                          </div>
+                        )}
                       </td>
                       <td className="py-4 px-4 text-xs font-semibold text-slate-800">
                         {item.kepala_sekolah}

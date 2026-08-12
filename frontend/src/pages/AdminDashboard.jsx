@@ -122,6 +122,8 @@ export default function AdminDashboard() {
         sejarah_yayasan: data.data.sejarah_yayasan || '',
         visi_yayasan: data.data.visi_yayasan || '',
         misi_yayasan: data.data.misi_yayasan || '',
+        lambang_desc: data.data.lambang_desc || 'Lambang Resmi Yayasan Pembina Lembaga Pendidikan Dasar dan Menengah PGRI Jawa Timur memiliki unsur utama berupa sayap bulu, suluh obor, serta warna dasar yang melambangkan pengabdian mulia dunia pendidikan.',
+        current_logo_lambang: data.data.logo_lambang || '',
         stat_kabupaten: data.data.stat_kabupaten || '38',
         stat_sekolah: data.data.stat_sekolah || '500+',
         stat_guru: data.data.stat_guru || '15.000+',
@@ -150,6 +152,7 @@ export default function AdminDashboard() {
     formData.append('sejarah_yayasan', settingsForm.sejarah_yayasan);
     formData.append('visi_yayasan', settingsForm.visi_yayasan);
     formData.append('misi_yayasan', settingsForm.misi_yayasan);
+    formData.append('lambang_desc', settingsForm.lambang_desc);
     formData.append('stat_kabupaten', settingsForm.stat_kabupaten);
     formData.append('stat_sekolah', settingsForm.stat_sekolah);
     formData.append('stat_guru', settingsForm.stat_guru);
@@ -164,6 +167,9 @@ export default function AdminDashboard() {
     }
     if (settingsForm.hero_image) {
       formData.append('hero_image', settingsForm.hero_image);
+    }
+    if (settingsForm.logo_lambang) {
+      formData.append('logo_lambang', settingsForm.logo_lambang);
     }
 
     const { data, error } = await requestHandler(() =>
@@ -562,6 +568,7 @@ export default function AdminDashboard() {
                     <tr>
                       <th className="py-3 px-6">NPSN & Nama Sekolah</th>
                       <th className="py-3 px-4">Jenjang & Wilayah</th>
+                      <th className="py-3 px-4">Alamat & Kontak</th>
                       <th className="py-3 px-4">Kepala Sekolah</th>
                       <th className="py-3 px-4 text-center">Akreditasi</th>
                       <th className="py-3 px-4 text-center">Aksi</th>
@@ -577,6 +584,10 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4">
                           <div className="font-semibold text-slate-800">{item.jenjang}</div>
                           <div className="text-xs text-slate-500">{item.kabupaten_kota}</div>
+                        </td>
+                        <td className="py-4 px-4 text-xs text-slate-600 max-w-xs">
+                          <div className="truncate">{item.alamat || '-'}</div>
+                          <div className="text-slate-500 font-mono text-[11px]">{item.kontak || '-'}</div>
                         </td>
                         <td className="py-4 px-4 text-xs font-semibold text-slate-700">{item.kepala_sekolah}</td>
                         <td className="py-4 px-4 text-center">
@@ -800,7 +811,7 @@ export default function AdminDashboard() {
                             <img
                               src={getImageUrl(settingsForm.current_foto)}
                               alt="Foto Ketua Yayasan saat ini"
-                              className="w-16 h-16 rounded-full object-cover border-2 border-red-700"
+                              className="w-16 h-16 rounded-2xl object-cover border-2 border-red-700 shadow-sm"
                             />
                             <div className="text-xs text-slate-600">
                               <span className="font-semibold block text-slate-900">Foto Ketua Saat Ini</span>
@@ -854,6 +865,39 @@ export default function AdminDashboard() {
                           placeholder="Teks sejarah singkat pembentukan yayasan..."
                           className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
                         ></textarea>
+                      </div>
+
+                      <div className="pt-4 border-t border-slate-200 space-y-4">
+                        <label className="block text-xs font-bold uppercase text-slate-700">Upload & Deskripsi Lambang Yayasan</label>
+                        {settingsForm.current_logo_lambang && (
+                          <div className="flex items-center gap-4 p-3 bg-white border border-slate-200 rounded-2xl">
+                            <img
+                              src={getImageUrl(settingsForm.current_logo_lambang)}
+                              alt="Lambang Yayasan"
+                              className="w-16 h-16 object-contain bg-slate-50 p-1 border border-slate-200 rounded-xl"
+                            />
+                            <div className="text-xs text-slate-600">
+                              <span className="font-semibold block text-slate-900">Lambang Yayasan Saat Ini</span>
+                              <span>Akan diganti jika Anda mengunggah logo/lambang baru.</span>
+                            </div>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setSettingsForm({ ...settingsForm, logo_lambang: e.target.files[0] })}
+                          className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-slate-300 rounded-xl p-1 bg-white"
+                        />
+                        <div>
+                          <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Deskripsi Singkat Lambang Yayasan</label>
+                          <textarea
+                            rows={3}
+                            value={settingsForm.lambang_desc}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, lambang_desc: e.target.value })}
+                            placeholder="Penjelasan umum lambang..."
+                            className="w-full p-3 rounded-xl border border-slate-300 text-sm bg-white"
+                          ></textarea>
+                        </div>
                       </div>
                     </div>
 
@@ -1257,14 +1301,27 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Alamat Sekolah</label>
-              <textarea
-                rows={2}
-                value={lembagaForm.alamat}
-                onChange={(e) => setLembagaForm({ ...lembagaForm, alamat: e.target.value })}
-                className="w-full p-2.5 rounded-xl border border-slate-300 text-sm"
-              ></textarea>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Alamat Sekolah</label>
+                <textarea
+                  rows={2}
+                  value={lembagaForm.alamat}
+                  onChange={(e) => setLembagaForm({ ...lembagaForm, alamat: e.target.value })}
+                  placeholder="Jl. Raya No. X..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 text-sm"
+                ></textarea>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Kontak / No. Telepon Sekolah</label>
+                <input
+                  type="text"
+                  value={lembagaForm.kontak}
+                  onChange={(e) => setLembagaForm({ ...lembagaForm, kontak: e.target.value })}
+                  placeholder="Contoh: (031) 123456 / 08123456789"
+                  className="w-full p-2.5 rounded-xl border border-slate-300 text-sm"
+                />
+              </div>
             </div>
 
             <button type="submit" className="w-full py-3 bg-red-700 text-white font-bold text-sm rounded-xl">
