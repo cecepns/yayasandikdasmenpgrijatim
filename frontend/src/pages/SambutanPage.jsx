@@ -5,6 +5,7 @@ import AOS from 'aos';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
+import { getImageUrl } from '../utils/image';
 
 export default function SambutanPage() {
   const [settings, setSettings] = useState({
@@ -49,7 +50,7 @@ export default function SambutanPage() {
             <div className="w-14 h-14 rounded-full bg-red-700 text-white flex items-center justify-center font-bold text-lg overflow-hidden border-2 border-yellow-400">
               {settings.foto_ketua ? (
                 <img
-                  src={settings.foto_ketua.startsWith('http') || settings.foto_ketua.startsWith('/') ? settings.foto_ketua : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${settings.foto_ketua}`}
+                  src={getImageUrl(settings.foto_ketua)}
                   alt={settings.nama_ketua}
                   className="w-full h-full object-cover"
                 />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Award, Shield, FileText, Database, ArrowRight, CheckCircle2,
-  Sparkles, BookOpen, Users, GraduationCap, Building2, MapPin
+  Sparkles, BookOpen, Users, GraduationCap, Building2, MapPin, Calendar
 } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -11,6 +11,7 @@ import heroBg from '../assets/hero-bg.png';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
+import { getImageUrl } from '../utils/image';
 
 export default function Home() {
   const [settings, setSettings] = useState({
@@ -22,6 +23,8 @@ export default function Home() {
     stat_guru: '15.000+',
     stat_siswa: '100.000+'
   });
+  const [beritaList, setBeritaList] = useState([]);
+  const [loadingBerita, setLoadingBerita] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -30,6 +33,7 @@ export default function Home() {
       easing: 'ease-out-cubic'
     });
     fetchSettings();
+    fetchLatestBerita();
   }, []);
 
   const fetchSettings = async () => {
@@ -45,6 +49,17 @@ export default function Home() {
         stat_guru: data.data.stat_guru || '15.000+',
         stat_siswa: data.data.stat_siswa || '100.000+'
       }));
+    }
+  };
+
+  const fetchLatestBerita = async () => {
+    setLoadingBerita(true);
+    const { data, error } = await requestHandler(() =>
+      api.get(API_ENDPOINTS.BERITA.LIST, { params: { page: 1, limit: 3 } })
+    );
+    setLoadingBerita(false);
+    if (!error && data?.data) {
+      setBeritaList(data.data);
     }
   };
 
@@ -128,7 +143,7 @@ export default function Home() {
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 p-1 border-2 border-yellow-400 flex items-center justify-center mb-4 overflow-hidden">
                 {settings.foto_ketua ? (
                   <img
-                    src={settings.foto_ketua.startsWith('http') || settings.foto_ketua.startsWith('/') ? settings.foto_ketua : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${settings.foto_ketua}`}
+                    src={getImageUrl(settings.foto_ketua)}
                     alt={settings.nama_ketua}
                     className="w-full h-full object-cover rounded-full"
                   />
@@ -302,6 +317,96 @@ export default function Home() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* 5. BERITA & KEGIATAN YAYASAN SECTION */}
+      <section className="py-14 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4" data-aos="fade-up">
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-red-700 uppercase tracking-wider bg-red-50 px-3 py-1 rounded-full border border-red-100">
+                Informasi & Kegiatan
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                Berita & Kegiatan Terbaru
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base">
+                Kabar terbaru seputar program, agenda, serta kegiatan Dikdasmen PGRI Jawa Timur.
+              </p>
+            </div>
+            <Link
+              to="/berita"
+              className="inline-flex items-center gap-2 font-bold text-red-700 hover:text-red-800 transition-colors text-sm shrink-0"
+            >
+              <span>Lihat Semua Berita</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {loadingBerita ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-slate-50 rounded-3xl h-72 animate-pulse border border-slate-100" />
+              ))}
+            </div>
+          ) : beritaList.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {beritaList.map((item, index) => (
+                <article
+                  key={item.id}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
+                  className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    {item.gambar && (
+                      <div className="w-full h-48 bg-slate-100 overflow-hidden">
+                        <img
+                          src={getImageUrl(item.gambar)}
+                          alt={item.judul}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6 space-y-3">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+                        <span className="px-3 py-1 bg-red-50 text-red-700 font-semibold rounded-full border border-red-100">
+                          {item.kategori || 'Kegiatan'}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{item.tanggal}</span>
+                        </div>
+                      </div>
+                      <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2 hover:text-red-700 transition-colors">
+                        {item.judul}
+                      </h3>
+                      <div
+                        className="text-slate-600 text-xs line-clamp-3 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: item.konten }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
+                    <Link
+                      to={`/berita/${item.id}`}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-red-700 hover:text-red-800 transition-colors"
+                    >
+                      <span>Baca Selengkapnya</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-slate-50 rounded-3xl border border-slate-200/80 text-slate-500 text-sm">
+              Belum ada berita atau kegiatan terbaru yang dipublikasikan.
+            </div>
+          )}
 
         </div>
       </section>

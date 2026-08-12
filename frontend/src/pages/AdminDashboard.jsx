@@ -15,6 +15,7 @@ import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../utils/image';
 
 export default function AdminDashboard() {
   const { tab } = useParams();
@@ -696,7 +697,7 @@ export default function AdminDashboard() {
                         {settingsForm.current_foto && (
                           <div className="flex items-center gap-4 mb-4 p-3 bg-white border border-slate-200 rounded-2xl">
                             <img
-                              src={settingsForm.current_foto.startsWith('http') || settingsForm.current_foto.startsWith('/') ? settingsForm.current_foto : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${settingsForm.current_foto}`}
+                              src={getImageUrl(settingsForm.current_foto)}
                               alt="Foto Ketua Yayasan saat ini"
                               className="w-16 h-16 rounded-full object-cover border-2 border-red-700"
                             />

@@ -4,6 +4,7 @@ import AOS from 'aos';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
+import { getImageUrl } from '../utils/image';
 
 export default function ProfilPage() {
   const [profileData, setProfileData] = useState({
@@ -135,7 +136,7 @@ Hingga saat ini, YPLP Dikdasmen PGRI Jawa Timur terus bertransformasi menjadi pu
                   <div key={p.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3 hover:shadow-md transition-shadow">
                     {p.foto ? (
                       <img
-                        src={p.foto.startsWith('http') || p.foto.startsWith('/') ? p.foto : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${p.foto}`}
+                        src={getImageUrl(p.foto)}
                         alt={p.nama}
                         className="w-20 h-20 rounded-full object-cover mx-auto shadow-md border-2 border-red-700"
                       />

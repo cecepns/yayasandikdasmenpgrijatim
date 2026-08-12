@@ -35,14 +35,20 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
 
-          {/* Logo Brand */}
-          <Link to="/" className="flex items-center group">
-            <div className="bg-white p-1.5 rounded-xl shadow-xs flex items-center justify-center transition-transform group-hover:scale-105">
+          {/* Logo Brand & Title */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="bg-white p-1.5 rounded-xl shadow-xs flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
               <img
                 src="/logo.png"
                 alt="Logo PGRI Dikdasmen Jatim"
                 className="h-11 sm:h-12 w-auto object-contain"
               />
+            </div>
+            <div className="flex flex-col text-white font-bold leading-tight uppercase tracking-tight text-[10px] sm:text-xs md:text-[11px] lg:text-xs">
+              <span>YAYASAN PEMBINA</span>
+              <span>LEMBAGA PENDIDIKAN DASAR DAN MENENGAH</span>
+              <span>PERSATUAN GURU REPUBLIK INDONESIA</span>
+              <span className="text-yellow-300 font-extrabold">JAWA TIMUR</span>
             </div>
           </Link>
 

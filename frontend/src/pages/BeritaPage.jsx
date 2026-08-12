@@ -8,6 +8,7 @@ import Pagination from '../components/Pagination';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import AOS from 'aos';
+import { getImageUrl } from '../utils/image';
 
 export default function BeritaPage() {
   const [beritaList, setBeritaList] = useState([]);
@@ -108,7 +109,7 @@ export default function BeritaPage() {
                 {item.gambar && (
                   <div className="w-full h-48 bg-slate-100 overflow-hidden">
                     <img
-                      src={item.gambar.startsWith('http') || item.gambar.startsWith('/') ? item.gambar : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${item.gambar}`}
+                      src={getImageUrl(item.gambar)}
                       alt={item.judul}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
@@ -175,7 +176,7 @@ export default function BeritaPage() {
               {selectedBerita.gambar && (
                 <div className="w-full h-64 bg-slate-100 rounded-2xl overflow-hidden mb-4">
                   <img
-                    src={selectedBerita.gambar.startsWith('http') || selectedBerita.gambar.startsWith('/') ? selectedBerita.gambar : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${selectedBerita.gambar}`}
+                    src={getImageUrl(selectedBerita.gambar)}
                     alt={selectedBerita.judul}
                     className="w-full h-full object-cover"
                   />

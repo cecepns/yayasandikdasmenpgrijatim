@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
 import toast from 'react-hot-toast';
 import AOS from 'aos';
+import { getImageUrl } from '../utils/image';
 
 export default function BeritaDetailPage() {
   const { id } = useParams();
@@ -54,9 +55,7 @@ export default function BeritaDetailPage() {
 
   if (!berita) return null;
 
-  const imageUrl = berita.gambar
-    ? (berita.gambar.startsWith('http') || berita.gambar.startsWith('/') ? berita.gambar : `https://api.kingcreativestudio.my.id/yayasan-pgri-jatim${berita.gambar}`)
-    : null;
+  const imageUrl = berita.gambar ? getImageUrl(berita.gambar) : null;
 
   return (
     <div className="bg-white py-12 lg:py-16 text-slate-800">
