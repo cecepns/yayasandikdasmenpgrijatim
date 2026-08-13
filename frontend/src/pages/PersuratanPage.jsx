@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
 import toast from 'react-hot-toast';
 import AOS from 'aos';
+import { getImageUrl } from '../utils/image';
 
 export default function PersuratanPage() {
   const [activeTab, setActiveTab] = useState('pengajuan'); // 'pengajuan' | 'lacak'
@@ -494,6 +495,24 @@ export default function PersuratanPage() {
                     <span className="text-xs text-slate-500 font-semibold uppercase">Perihal Surat:</span>
                     <p className="font-bold text-slate-800">{lacakResult.perihal}</p>
                   </div>
+
+                  {lacakResult.file_lampiran && (
+                    <div className="sm:col-span-2 pt-2 border-t border-slate-100 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs text-slate-500 font-semibold uppercase block">File Lampiran Surat:</span>
+                        <span className="text-xs text-slate-600">Berkas pendukung yang telah diunggah</span>
+                      </div>
+                      <a
+                        href={getImageUrl(lacakResult.file_lampiran)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl text-xs font-bold border border-emerald-200 transition-colors shadow-sm"
+                      >
+                        <FileText className="w-4 h-4 text-emerald-600" />
+                        <span>Lihat / Unduh File Lampiran</span>
+                      </a>
+                    </div>
+                  )}
                 </div>
 
                 {lacakResult.catatan_admin && (

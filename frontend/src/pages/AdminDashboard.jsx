@@ -511,6 +511,7 @@ export default function AdminDashboard() {
                       <th className="py-3 px-6">No. Resi</th>
                       <th className="py-3 px-4">Pemohon / Sekolah</th>
                       <th className="py-3 px-4">Jenis & Perihal</th>
+                      <th className="py-3 px-4 text-center">File Lampiran</th>
                       <th className="py-3 px-4 text-center">Status</th>
                       <th className="py-3 px-4 text-center">Aksi</th>
                     </tr>
@@ -528,6 +529,22 @@ export default function AdminDashboard() {
                           <div className="text-xs text-slate-500">{item.perihal}</div>
                         </td>
                         <td className="py-4 px-4 text-center">
+                          {item.file_lampiran ? (
+                            <a
+                              href={getImageUrl(item.file_lampiran)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold border border-emerald-200 transition-colors shadow-sm"
+                              title="Lihat / Unduh File Lampiran"
+                            >
+                              <FileText className="w-4 h-4 text-emerald-600" />
+                              <span>Lihat File</span>
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-400 italic">Tidak Ada File</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4 text-center">
                           <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.status === 'Disetujui' ? 'bg-emerald-100 text-emerald-800' :
                               item.status === 'Diproses' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
                             }`}>
@@ -540,7 +557,8 @@ export default function AdminDashboard() {
                               setSuratStatusForm({
                                 id: item.id,
                                 status: item.status,
-                                catatan_admin: item.catatan_admin || ''
+                                catatan_admin: item.catatan_admin || '',
+                                selectedSurat: item
                               });
                               setIsModalOpen(true);
                             }}
@@ -1203,6 +1221,40 @@ export default function AdminDashboard() {
 
         {activeTab === 'persuratan' && (
           <form onSubmit={handleSubmitStatusSurat} className="space-y-4">
+            {suratStatusForm.selectedSurat && (
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2 mb-4">
+                <div className="flex justify-between items-center pb-2 border-b border-slate-200">
+                  <span className="font-bold text-slate-700">No. Resi:</span>
+                  <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{suratStatusForm.selectedSurat.no_resi}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Pemohon: </span>
+                  <span className="font-semibold text-slate-800">{suratStatusForm.selectedSurat.nama_pengirim || suratStatusForm.selectedSurat.nama_pengaju}</span> ({suratStatusForm.selectedSurat.pengirim_surat || suratStatusForm.selectedSurat.lembaga_sekolah})
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Perihal: </span>
+                  <span className="text-slate-800">{suratStatusForm.selectedSurat.perihal}</span>
+                </div>
+                {suratStatusForm.selectedSurat.file_lampiran ? (
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                    <span className="font-semibold text-slate-700">File Lampiran User:</span>
+                    <a
+                      href={getImageUrl(suratStatusForm.selectedSurat.file_lampiran)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Buka / Unduh File</span>
+                    </a>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-slate-200 text-slate-400 italic">
+                    Pengaju tidak mengunggah file lampiran.
+                  </div>
+                )}
+              </div>
+            )}
             <div>
               <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Status Persuratan *</label>
               <select
@@ -1225,7 +1277,7 @@ export default function AdminDashboard() {
                 className="w-full p-3 rounded-xl border border-slate-300 text-sm"
               ></textarea>
             </div>
-            <button type="submit" className="w-full py-3 bg-red-700 text-white font-bold text-sm rounded-xl">
+            <button type="submit" className="w-full py-3 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md transition-all">
               Update Status Surat
             </button>
           </form>
