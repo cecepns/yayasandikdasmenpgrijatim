@@ -51,7 +51,29 @@ export default function KontakPage() {
       toast.error('Mohon lengkapi nama dan isi pesan Anda');
       return;
     }
-    toast.success('Pesan Anda berhasil dikirimkan ke Sekretariat Yayasan Dikdasmen PGRI Jatim!');
+
+    // Ambil nomor WA pertama dari admin settings (misal "085157992979 / 085335100280")
+    const phoneString = contactInfo.telepon_yayasan || '';
+    // Ambil opsi nomor pertama sebelum slash/koma jika ada
+    const firstNumber = phoneString.split(/[\/\,]/)[0].trim();
+    // Bersihkan karakter non-digit
+    let cleanPhone = firstNumber.replace(/\D/g, '');
+
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '62' + cleanPhone.slice(1);
+    }
+
+    if (!cleanPhone) {
+      toast.error('Nomor telepon/WA yayasan tidak valid');
+      return;
+    }
+
+    const messageText = `Halo Admin Yayasan Dikdasmen PGRI Jatim,\n\nSaya ingin menyampaikan pesan/pertanyaan:\n\n*Nama:* ${formData.nama}\n*Email:* ${formData.email || '-'}\n*Telepon:* ${formData.telepon || '-'}\n*Subjek:* ${formData.subjek || '-'}\n*Pesan:* ${formData.pesan}`;
+
+    const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(messageText)}`;
+
+    toast.success('Mengarahkan ke WhatsApp Yayasan...');
+    window.open(waUrl, '_blank');
     setFormData({ nama: '', email: '', telepon: '', subjek: '', pesan: '' });
   };
 
