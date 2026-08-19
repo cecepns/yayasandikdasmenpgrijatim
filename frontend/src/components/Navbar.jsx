@@ -45,8 +45,8 @@ export default function Navbar() {
               />
             </div>
             <div className="flex flex-col text-white font-bold leading-tight uppercase tracking-tight text-[10px] sm:text-xs md:text-[11px] lg:text-xs">
-              <span>YAYASAN PEMBINA</span>
-              <span>LEMBAGA PENDIDIKAN DASAR DAN MENENGAH</span>
+              <span>YAYASAN PEMBINA LEMBAGA PENDIDIKAN</span>
+              <span>DASAR DAN MENENGAH</span>
               <span>PERSATUAN GURU REPUBLIK INDONESIA</span>
               <span className="text-yellow-300 font-extrabold">JAWA TIMUR</span>
             </div>
