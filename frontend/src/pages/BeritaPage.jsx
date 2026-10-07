@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Search, Calendar, User, ArrowRight } from 'lucide-react';
+import { BookOpen, Search, Calendar, User, ArrowRight, Play, Video } from 'lucide-react';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
@@ -8,7 +8,7 @@ import Pagination from '../components/Pagination';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import AOS from 'aos';
-import { getImageUrl } from '../utils/image';
+import { getImageUrl, getYoutubeEmbedUrl } from '../utils/image';
 
 export default function BeritaPage() {
   const [beritaList, setBeritaList] = useState([]);
@@ -106,15 +106,26 @@ export default function BeritaPage() {
                 className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
               >
                 {/* Thumbnail Image display */}
-                {item.gambar && (
-                  <div className="w-full h-48 bg-slate-100 overflow-hidden">
+                <div className="relative w-full h-48 bg-slate-100 overflow-hidden">
+                  {item.gambar ? (
                     <img
                       src={getImageUrl(item.gambar)}
                       alt={item.judul}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
+                      <BookOpen className="w-12 h-12 opacity-40" />
+                    </div>
+                  )}
+
+                  {(item.video || item.video_url) && (
+                    <div className="absolute top-3 right-3 bg-red-600/90 text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md backdrop-blur-xs">
+                      <Play className="w-3 h-3 fill-white" />
+                      <span>Video</span>
+                    </div>
+                  )}
+                </div>
 
                 <div className="p-6 space-y-4">
                   <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
@@ -173,15 +184,43 @@ export default function BeritaPage() {
         >
           {selectedBerita && (
             <div className="space-y-4">
-              {selectedBerita.gambar && (
-                <div className="w-full h-64 bg-slate-100 rounded-2xl overflow-hidden mb-4">
-                  <img
-                    src={getImageUrl(selectedBerita.gambar)}
-                    alt={selectedBerita.judul}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              {(() => {
+                const ytUrl = getYoutubeEmbedUrl(selectedBerita.video_url);
+                if (ytUrl) {
+                  return (
+                    <div className="w-full aspect-video rounded-2xl overflow-hidden mb-4 bg-black">
+                      <iframe
+                        src={ytUrl}
+                        title={selectedBerita.judul}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full border-0"
+                      ></iframe>
+                    </div>
+                  );
+                }
+                if (selectedBerita.video) {
+                  return (
+                    <div className="w-full aspect-video rounded-2xl overflow-hidden mb-4 bg-black">
+                      <video controls className="w-full h-full object-contain">
+                        <source src={getImageUrl(selectedBerita.video)} type="video/mp4" />
+                      </video>
+                    </div>
+                  );
+                }
+                if (selectedBerita.gambar) {
+                  return (
+                    <div className="w-full h-64 bg-slate-100 rounded-2xl overflow-hidden mb-4">
+                      <img
+                        src={getImageUrl(selectedBerita.gambar)}
+                        alt={selectedBerita.judul}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              })()}
 
               <div className="flex items-center gap-4 text-xs text-slate-500 border-b border-slate-100 pb-3">
                 <span className="font-semibold text-red-700">{selectedBerita.kategori}</span>

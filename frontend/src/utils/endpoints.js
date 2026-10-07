@@ -2,6 +2,12 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
   },
+  USERS: {
+    LIST: "/users",
+    CREATE: "/users",
+    UPDATE: (id) => `/users/${id}`,
+    DELETE: (id) => `/users/${id}`,
+  },
   BERITA: {
     LIST: "/berita",
     DETAIL: (id) => `/berita/${id}`,

@@ -10,12 +10,13 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `nama` VARCHAR(100) NOT NULL,
-  `role` ENUM('admin', 'staff') DEFAULT 'admin',
+  `role` ENUM('admin', 'editor', 'staff') DEFAULT 'editor',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO `users` (`id`, `username`, `password`, `nama`, `role`) VALUES
-(1, 'admin', 'admin123', 'Administrator Yayasan PGRI Jatim', 'admin')
+(1, 'admin', 'admin123', 'Administrator Yayasan PGRI Jatim', 'admin'),
+(2, 'penulis', 'penulis123', 'Staff Publikasi & Berita PGRI', 'editor')
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- 2. Table berita
@@ -26,15 +27,17 @@ CREATE TABLE IF NOT EXISTS `berita` (
   `kategori` VARCHAR(100) NOT NULL,
   `konten` TEXT NOT NULL,
   `gambar` VARCHAR(255) DEFAULT NULL,
+  `video` VARCHAR(255) DEFAULT NULL,
+  `video_url` VARCHAR(255) DEFAULT NULL,
   `penulis` VARCHAR(100) DEFAULT 'Admin Dikdasmen PGRI',
   `tanggal` DATE DEFAULT (CURRENT_DATE),
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO `berita` (`id`, `judul`, `slug`, `kategori`, `konten`, `gambar`, `penulis`, `tanggal`) VALUES
-(1, 'Rapat Koordinasi Wilayah Pengurus Yayasan Dikdasmen PGRI Jawa Timur 2026', 'rapat-koordinasi-wilayah-2026', 'Kegiatan', 'Pengurus Yayasan Dikdasmen PGRI Jawa Timur menyelenggarakan Rapat Koordinasi Wilayah (Rakorwil) yang dihadiri oleh seluruh Ketua Perwakilan Kabupaten/Kota se-Jawa Timur. Agenda utama mencakup penguatan tata kelola mutu sekolah dan digitalisasi layanan persuratan.', NULL, 'Humas Yayasan', '2026-08-01'),
-(2, 'Pelatihan Peningkatan Kompetensi Guru Lembaga Pendidikan PGRI Jatim', 'pelatihan-kompetensi-guru-pgri-jatim', 'Pendidikan', 'Dalam rangka meningkatkan profesionalisme dan kreativitas pendidik, Yayasan Dikdasmen PGRI Jawa Timur menggelar pelatihan pembuatan media pembelajaran berbasis teknologi digital.', NULL, 'Divisi Pendidikan', '2026-08-05'),
-(3, 'Sistem Informasi Lembaga (SIL) Dan Layanan E-Surat Resmi Diluncurkan', 'sistem-informasi-lembaga-resmi-diluncurkan', 'Pengumuman', 'Yayasan Dikdasmen PGRI Jawa Timur meluncurkan portal Sistem Informasi Lembaga dan Layanan Persuratan Online guna mempermudah koordinasi antar sekolah dan pengurus daerah.', NULL, 'Admin Dikdasmen PGRI', '2026-08-09')
+INSERT INTO `berita` (`id`, `judul`, `slug`, `kategori`, `konten`, `gambar`, `video`, `video_url`, `penulis`, `tanggal`) VALUES
+(1, 'Rapat Koordinasi Wilayah Pengurus Yayasan Dikdasmen PGRI Jawa Timur 2026', 'rapat-koordinasi-wilayah-2026', 'Kegiatan', 'Pengurus Yayasan Dikdasmen PGRI Jawa Timur menyelenggarakan Rapat Koordinasi Wilayah (Rakorwil) yang dihadiri oleh seluruh Ketua Perwakilan Kabupaten/Kota se-Jawa Timur. Agenda utama mencakup penguatan tata kelola mutu sekolah dan digitalisasi layanan persuratan.', NULL, NULL, NULL, 'Humas Yayasan', '2026-08-01'),
+(2, 'Pelatihan Peningkatan Kompetensi Guru Lembaga Pendidikan PGRI Jatim', 'pelatihan-kompetensi-guru-pgri-jatim', 'Pendidikan', 'Dalam rangka meningkatkan profesionalisme dan kreativitas pendidik, Yayasan Dikdasmen PGRI Jawa Timur menggelar pelatihan pembuatan media pembelajaran berbasis teknologi digital.', NULL, NULL, NULL, 'Divisi Pendidikan', '2026-08-05'),
+(3, 'Sistem Informasi Lembaga (SIL) Dan Layanan E-Surat Resmi Diluncurkan', 'sistem-informasi-lembaga-resmi-diluncurkan', 'Pengumuman', 'Yayasan Dikdasmen PGRI Jawa Timur meluncurkan portal Sistem Informasi Lembaga dan Layanan Persuratan Online guna mempermudah koordinasi antar sekolah dan pengurus daerah.', NULL, NULL, NULL, 'Admin Dikdasmen PGRI', '2026-08-09')
 ON DUPLICATE KEY UPDATE `id`=`id`;
 
 -- 3. Table layanan_persuratan (Form Surat Umum)

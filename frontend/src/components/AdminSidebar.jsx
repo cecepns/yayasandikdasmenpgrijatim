@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShieldCheck, FileText, Database, BookOpen, LogOut, Menu, X, ArrowLeft, Users, Settings } from 'lucide-react';
+import { ShieldCheck, FileText, Database, BookOpen, LogOut, Menu, X, ArrowLeft, Users, Settings, UserCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminSidebar({ activeTab }) {
@@ -8,13 +8,32 @@ export default function AdminSidebar({ activeTab }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = [
-    { id: 'berita', path: '/admin/berita', label: 'Kelola Berita', icon: BookOpen },
-    { id: 'persuratan', path: '/admin/persuratan', label: 'Layanan Persuratan', icon: FileText },
-    { id: 'sistem-informasi', path: '/admin/sistem-informasi', label: 'Data Lembaga (SIL)', icon: Database },
-    { id: 'pengurus', path: '/admin/pengurus', label: 'Pengurus Yayasan', icon: Users },
-    { id: 'settings', path: '/admin/settings', label: 'Profil & Sambutan', icon: Settings },
-  ];
+  // Get current logged in user from localStorage
+  const currentUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('adminToken') || '{}');
+    } catch {
+      return {};
+    }
+  })();
+
+  const isSuperAdmin = currentUser?.role === 'admin';
+
+  // Menu items based on role:
+  // If Super Admin: all menus + Kelola Admin (users)
+  // If Editor (Admin Berita): only Berita & Pengumuman
+  const menuItems = isSuperAdmin
+    ? [
+        { id: 'berita', path: '/admin/berita', label: 'Kelola Berita & Info', icon: BookOpen },
+        { id: 'persuratan', path: '/admin/persuratan', label: 'Layanan Persuratan', icon: FileText },
+        { id: 'sistem-informasi', path: '/admin/sistem-informasi', label: 'Data Lembaga (SIL)', icon: Database },
+        { id: 'pengurus', path: '/admin/pengurus', label: 'Pengurus Yayasan', icon: Users },
+        { id: 'settings', path: '/admin/settings', label: 'Profil & Sambutan', icon: Settings },
+        { id: 'users', path: '/admin/users', label: 'Kelola Admin / User', icon: UserCheck },
+      ]
+    : [
+        { id: 'berita', path: '/admin/berita', label: 'Berita & Pengumuman', icon: BookOpen },
+      ];
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -47,7 +66,7 @@ export default function AdminSidebar({ activeTab }) {
       `}>
         <div>
           {/* Brand Header */}
-          <div className="p-6 border-b border-slate-800 flex items-center gap-3">
+          <div className="p-5 border-b border-slate-800 flex items-center gap-3">
             <img src="/logo.png" alt="Logo PGRI" className="h-10 w-auto bg-white p-1 rounded" />
             <div>
               <h2 className="font-bold text-white text-sm leading-tight">PANEL ADMIN</h2>
@@ -55,10 +74,31 @@ export default function AdminSidebar({ activeTab }) {
             </div>
           </div>
 
+          {/* User Info & Role Badge */}
+          <div className="px-5 py-3.5 bg-slate-800/60 border-b border-slate-800/80">
+            <div className="flex items-center justify-between gap-2">
+              <div className="truncate">
+                <p className="text-xs font-semibold text-white truncate">
+                  {currentUser?.nama || currentUser?.username || 'Admin'}
+                </p>
+                <p className="text-[11px] text-slate-400 font-mono truncate">
+                  @{currentUser?.username || 'admin'}
+                </p>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${
+                isSuperAdmin 
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+              }`}>
+                {isSuperAdmin ? 'Super Admin' : 'Admin Berita'}
+              </span>
+            </div>
+          </div>
+
           {/* Navigation Links */}
           <nav className="p-4 space-y-1">
             <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Manajemen Data
+              {isSuperAdmin ? 'Manajemen Data & Lembaga' : 'Kelola Konten'}
             </div>
             {menuItems.map(item => {
               const Icon = item.icon;

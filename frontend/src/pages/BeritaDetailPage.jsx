@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, User, ArrowLeft, BookOpen, Share2, Tag } from 'lucide-react';
+import { Calendar, User, ArrowLeft, BookOpen, Share2, Tag, Video } from 'lucide-react';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
 import toast from 'react-hot-toast';
 import AOS from 'aos';
-import { getImageUrl } from '../utils/image';
+import { getImageUrl, getYoutubeEmbedUrl } from '../utils/image';
 
 export default function BeritaDetailPage() {
   const { id } = useParams();
@@ -105,6 +105,46 @@ export default function BeritaDetailPage() {
             />
           </div>
         )}
+
+        {/* Video Player Section */}
+        {(() => {
+          const ytUrl = getYoutubeEmbedUrl(berita.video_url);
+          const hasVideo = Boolean(berita.video || ytUrl);
+          if (!hasVideo) return null;
+
+          return (
+            <div className="space-y-3 pt-2" data-aos="fade-up">
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                <div className="p-1.5 bg-red-50 text-red-700 rounded-lg">
+                  <Video className="w-4 h-4" />
+                </div>
+                <span>Video Liputan / Dokumentasi</span>
+              </div>
+
+              <div className="w-full rounded-3xl overflow-hidden shadow-lg border border-slate-200 bg-black aspect-video flex items-center justify-center">
+                {ytUrl ? (
+                  <iframe
+                    src={ytUrl}
+                    title={`Video ${berita.judul}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  ></iframe>
+                ) : berita.video ? (
+                  <video
+                    controls
+                    controlsList="nodownload"
+                    className="w-full h-full object-contain"
+                    poster={imageUrl || undefined}
+                  >
+                    <source src={getImageUrl(berita.video)} type="video/mp4" />
+                    Browser Anda tidak mendukung pemutar video HTML5.
+                  </video>
+                ) : null}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Content Body */}
         <div

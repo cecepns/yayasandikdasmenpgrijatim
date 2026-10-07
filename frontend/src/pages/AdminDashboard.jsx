@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck, BookOpen, FileText, Database, Plus, Search,
   Trash2, Edit, CheckCircle, XCircle, Clock, Eye, AlertTriangle, Upload,
-  UserCheck, Sparkles, Phone
+  UserCheck, Sparkles, Phone, Video, Film, Play, Image as ImageIcon
 } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -26,16 +26,35 @@ export default function AdminDashboard() {
   const [loginForm, setLoginForm] = useState({ username: 'admin', password: '' });
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Derive activeTab from route params (e.g. /admin/berita, /admin/persuratan, /admin/sistem-informasi)
+  // Current logged in user profile & role
+  const currentUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('adminToken') || '{}');
+    } catch {
+      return {};
+    }
+  })();
+  const isSuperAdmin = currentUser?.role === 'admin';
+
+  // Derive activeTab from route params (e.g. /admin/berita, /admin/persuratan, /admin/sistem-informasi, /admin/users)
   const tabParamMap = {
     'berita': 'berita',
     'persuratan': 'persuratan',
     'sistem-informasi': 'lembaga',
     'lembaga': 'lembaga',
     'pengurus': 'pengurus',
-    'settings': 'settings'
+    'settings': 'settings',
+    'users': 'users'
   };
   const activeTab = tabParamMap[tab] || 'berita';
+
+  // Role Access Control: Non-superadmin is restricted exclusively to 'berita'
+  useEffect(() => {
+    if (isAuthenticated && !isSuperAdmin && activeTab !== 'berita') {
+      toast.error('Akses dibatasi. Akun Anda hanya berhak mengelola Berita & Pengumuman.');
+      navigate('/admin/berita', { replace: true });
+    }
+  }, [isAuthenticated, isSuperAdmin, activeTab, navigate]);
 
   // Shared Data & State
   const [items, setItems] = useState([]);
@@ -49,7 +68,24 @@ export default function AdminDashboard() {
   const [editItem, setEditItem] = useState(null);
 
   // Specific Forms
-  const [beritaForm, setBeritaForm] = useState({ judul: '', kategori: 'Kegiatan', konten: '', penulis: 'Admin Dikdasmen PGRI', gambar: null });
+  const [beritaForm, setBeritaForm] = useState({
+    judul: '',
+    kategori: 'Kegiatan',
+    konten: '',
+    penulis: currentUser?.nama || 'Admin Dikdasmen PGRI',
+    gambar: null,
+    video: null,
+    video_url: '',
+    current_gambar: '',
+    current_video: '',
+    remove_video: false
+  });
+  const [userForm, setUserForm] = useState({
+    nama: '',
+    username: '',
+    password: '',
+    role: 'editor'
+  });
   const [suratStatusForm, setSuratStatusForm] = useState({ id: null, status: 'Disetujui', catatan_admin: '' });
   const [lembagaForm, setLembagaForm] = useState({
     npsn: '', nama_sekolah: '', jenjang: 'SMA/MA', kabupaten_kota: 'Kota Surabaya',
@@ -214,6 +250,7 @@ export default function AdminDashboard() {
     if (tab === 'persuratan') endpoint = API_ENDPOINTS.PERSURATAN.LIST;
     if (tab === 'lembaga') endpoint = API_ENDPOINTS.LEMBAGA.LIST;
     if (tab === 'pengurus') endpoint = API_ENDPOINTS.PENGURUS.LIST;
+    if (tab === 'users') endpoint = API_ENDPOINTS.USERS.LIST;
 
     const { data, error } = await requestHandler(() =>
       api.get(endpoint, { params: { page, limit, search: querySearch } })
@@ -261,6 +298,7 @@ export default function AdminDashboard() {
     if (activeTab === 'persuratan') endpoint = API_ENDPOINTS.PERSURATAN.DELETE(id);
     if (activeTab === 'lembaga') endpoint = API_ENDPOINTS.LEMBAGA.DELETE(id);
     if (activeTab === 'pengurus') endpoint = API_ENDPOINTS.PENGURUS.DELETE(id);
+    if (activeTab === 'users') endpoint = API_ENDPOINTS.USERS.DELETE(id);
 
     const { error } = await requestHandler(() => api.delete(endpoint));
     if (error) {
@@ -304,8 +342,11 @@ export default function AdminDashboard() {
     data.append('judul', beritaForm.judul);
     data.append('kategori', beritaForm.kategori);
     data.append('konten', beritaForm.konten);
-    data.append('penulis', beritaForm.penulis);
+    data.append('penulis', beritaForm.penulis || currentUser?.nama || 'Admin Dikdasmen PGRI');
     if (beritaForm.gambar) data.append('gambar', beritaForm.gambar);
+    if (beritaForm.video) data.append('video', beritaForm.video);
+    if (beritaForm.video_url) data.append('video_url', beritaForm.video_url);
+    if (beritaForm.remove_video) data.append('remove_video', 'true');
 
     let requestFn = () => api.post(API_ENDPOINTS.BERITA.CREATE, data, { headers: { 'Content-Type': 'multipart/form-data' } });
     if (editItem) {
@@ -319,6 +360,33 @@ export default function AdminDashboard() {
       toast.success(editItem ? 'Berita berhasil diperbarui' : 'Berita baru berhasil diterbitkan');
       setIsModalOpen(false);
       loadTabData('berita', pagination.page, pagination.limit, debouncedSearch);
+    }
+  };
+
+  // Submit User (Kelola Admin / Editor)
+  const handleSubmitUser = async (e) => {
+    e.preventDefault();
+    if (!userForm.nama || !userForm.username) {
+      toast.error('Nama dan username wajib diisi');
+      return;
+    }
+    if (!editItem && !userForm.password) {
+      toast.error('Password wajib diisi untuk akun admin baru');
+      return;
+    }
+
+    let requestFn = () => api.post(API_ENDPOINTS.USERS.CREATE, userForm);
+    if (editItem) {
+      requestFn = () => api.put(API_ENDPOINTS.USERS.UPDATE(editItem.id), userForm);
+    }
+
+    const { error } = await requestHandler(requestFn);
+    if (error) {
+      toast.error(error);
+    } else {
+      toast.success(editItem ? 'Akun admin berhasil diperbarui' : 'Akun admin baru berhasil dibuat');
+      setIsModalOpen(false);
+      loadTabData('users', pagination.page, pagination.limit, debouncedSearch);
     }
   };
 
@@ -391,6 +459,7 @@ export default function AdminDashboard() {
               {activeTab === 'lembaga' && 'Sistem Informasi Lembaga (SIL)'}
               {activeTab === 'pengurus' && 'Manajemen Pengurus Yayasan'}
               {activeTab === 'settings' && 'Kelola Profil, Visi Misi & Sambutan'}
+              {activeTab === 'users' && 'Kelola Akun Admin / User'}
             </h1>
             <p className="text-xs text-slate-500 font-medium">Panel Pengurus Yayasan Dikdasmen PGRI Jawa Timur</p>
           </div>
@@ -401,7 +470,18 @@ export default function AdminDashboard() {
               onClick={() => {
                 setEditItem(null);
                 if (activeTab === 'berita') {
-                  setBeritaForm({ judul: '', kategori: 'Kegiatan', konten: '', penulis: 'Admin Dikdasmen PGRI', gambar: null });
+                  setBeritaForm({
+                    judul: '',
+                    kategori: 'Kegiatan',
+                    konten: '',
+                    penulis: currentUser?.nama || 'Admin Dikdasmen PGRI',
+                    gambar: null,
+                    video: null,
+                    video_url: '',
+                    current_gambar: '',
+                    current_video: '',
+                    remove_video: false
+                  });
                 }
                 if (activeTab === 'lembaga') {
                   setLembagaForm({
@@ -412,6 +492,9 @@ export default function AdminDashboard() {
                 if (activeTab === 'pengurus') {
                   setPengurusForm({ nama: '', jabatan: '', kategori: 'Pengurus Harian', deskripsi: '', urutan: 1, foto: null });
                 }
+                if (activeTab === 'users') {
+                  setUserForm({ nama: '', username: '', password: '', role: 'editor' });
+                }
                 setIsModalOpen(true);
               }}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md transition-all"
@@ -421,6 +504,7 @@ export default function AdminDashboard() {
                 {activeTab === 'berita' && 'Tambah Berita Baru'}
                 {activeTab === 'lembaga' && 'Tambah Lembaga Sekolah'}
                 {activeTab === 'pengurus' && 'Tambah Pengurus Yayasan'}
+                {activeTab === 'users' && 'Tambah Admin / User'}
               </span>
             </button>
           )}
@@ -455,7 +539,7 @@ export default function AdminDashboard() {
                 <table className="w-full text-left text-sm">
                   <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                     <tr>
-                      <th className="py-3 px-6">Judul Berita</th>
+                      <th className="py-3 px-6">Judul Berita & Media</th>
                       <th className="py-3 px-4">Kategori</th>
                       <th className="py-3 px-4">Tanggal & Penulis</th>
                       <th className="py-3 px-4 text-center">Aksi</th>
@@ -464,7 +548,23 @@ export default function AdminDashboard() {
                   <tbody className="divide-y divide-slate-100">
                     {items.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="py-4 px-6 font-bold text-slate-800">{item.judul}</td>
+                        <td className="py-4 px-6 font-bold text-slate-800">
+                          <div className="space-y-1">
+                            <p className="line-clamp-2">{item.judul}</p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              {item.gambar && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                                  <ImageIcon className="w-3 h-3 text-slate-500" /> Foto
+                                </span>
+                              )}
+                              {(item.video || item.video_url) && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                                  <Video className="w-3 h-3 text-rose-600" /> Video
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
                         <td className="py-4 px-4">
                           <span className="px-2.5 py-1 bg-red-50 text-red-700 rounded-md text-xs font-semibold">
                             {item.kategori}
@@ -482,17 +582,24 @@ export default function AdminDashboard() {
                                 kategori: item.kategori,
                                 konten: item.konten,
                                 penulis: item.penulis,
-                                gambar: null
+                                gambar: null,
+                                video: null,
+                                video_url: item.video_url || '',
+                                current_gambar: item.gambar || '',
+                                current_video: item.video || '',
+                                remove_video: false
                               });
                               setIsModalOpen(true);
                             }}
                             className="p-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg"
+                            title="Edit Berita"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(item.id, item.judul)}
                             className="p-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg"
+                            title="Hapus Berita"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -1053,6 +1160,68 @@ export default function AdminDashboard() {
                 </div>
               )}
 
+              {/* 6. TABLE USERS */}
+              {activeTab === 'users' && (
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-6">Nama Admin</th>
+                      <th className="py-3 px-4">Username</th>
+                      <th className="py-3 px-4">Hak Akses / Role</th>
+                      <th className="py-3 px-4 text-center">Tanggal Dibuat</th>
+                      <th className="py-3 px-4 text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {items.map((user) => (
+                      <tr key={user.id} className="hover:bg-slate-50">
+                        <td className="py-4 px-6 font-bold text-slate-800">{user.nama}</td>
+                        <td className="py-4 px-4 font-mono text-xs text-slate-600">@{user.username}</td>
+                        <td className="py-4 px-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                            user.role === 'admin' 
+                              ? 'bg-red-50 text-red-700 border border-red-200' 
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            {user.role === 'admin' ? 'Super Admin' : 'Admin Berita'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-xs text-slate-500 text-center">
+                          {user.created_at ? new Date(user.created_at).toLocaleDateString('id-ID') : '-'}
+                        </td>
+                        <td className="py-4 px-4 text-center space-x-2">
+                          <button
+                            onClick={() => {
+                              setEditItem(user);
+                              setUserForm({
+                                nama: user.nama,
+                                username: user.username,
+                                password: '',
+                                role: user.role || 'editor'
+                              });
+                              setIsModalOpen(true);
+                            }}
+                            className="p-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
+                            title="Edit Admin"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          {user.id !== 1 && (
+                            <button
+                              onClick={() => handleDelete(user.id, user.nama)}
+                              className="p-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg transition-colors"
+                              title="Hapus Admin"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
             </div>
           )}
 
@@ -1073,10 +1242,11 @@ export default function AdminDashboard() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={
-          activeTab === 'berita' ? (editItem ? 'Edit Berita' : 'Tambah Berita Baru') :
+          activeTab === 'berita' ? (editItem ? 'Edit Berita & Informasi' : 'Tambah Berita Baru') :
             activeTab === 'persuratan' ? 'Update Status Persuratan' :
               activeTab === 'pengurus' ? (editItem ? 'Edit Pengurus Yayasan' : 'Tambah Pengurus Yayasan') :
-                (editItem ? 'Edit Data Lembaga' : 'Tambah Data Lembaga')
+                activeTab === 'users' ? (editItem ? 'Edit Akun Admin' : 'Tambah Akun Admin Baru') :
+                  (editItem ? 'Edit Data Lembaga' : 'Tambah Data Lembaga')
         }
       >
         {activeTab === 'pengurus' && (
@@ -1160,6 +1330,67 @@ export default function AdminDashboard() {
             </button>
           </form>
         )}
+        {activeTab === 'users' && (
+          <form onSubmit={handleSubmitUser} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Nama Lengkap Admin *</label>
+              <input
+                type="text"
+                value={userForm.nama}
+                onChange={(e) => setUserForm({ ...userForm, nama: e.target.value })}
+                required
+                placeholder="Contoh: Ahmad Baihaqi, S.Kom"
+                className="w-full p-3 rounded-xl border border-slate-300 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Username Login *</label>
+              <input
+                type="text"
+                value={userForm.username}
+                onChange={(e) => setUserForm({ ...userForm, username: e.target.value.toLowerCase().trim() })}
+                required
+                placeholder="Contoh: ahmad_editor"
+                className="w-full p-3 rounded-xl border border-slate-300 text-sm font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                Password {editItem ? '(Kosongkan jika tidak diubah)' : '*'}
+              </label>
+              <input
+                type="password"
+                value={userForm.password}
+                onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                required={!editItem}
+                placeholder={editItem ? '•••••••• (Biarkan kosong jika tidak diubah)' : 'Minimal 6 karakter'}
+                className="w-full p-3 rounded-xl border border-slate-300 text-sm font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Peran / Hak Akses (Role) *</label>
+              <select
+                value={userForm.role}
+                onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
+                className="w-full p-3 rounded-xl border border-slate-300 text-sm font-semibold"
+              >
+                <option value="editor">Admin Berita (Hanya bisa kelola Berita & Pengumuman)</option>
+                <option value="admin">Super Admin (Akses Penuh ke Seluruh Menu)</option>
+              </select>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Akun dengan peran <strong>Admin Berita</strong> hanya dapat mengakses menu Berita & Pengumuman di panel admin.
+              </p>
+            </div>
+
+            <button type="submit" className="w-full py-3 bg-red-700 hover:bg-red-800 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+              {editItem ? 'Simpan Perubahan Admin' : 'Buat Akun Admin Baru'}
+            </button>
+          </form>
+        )}
+
         {activeTab === 'berita' && (
           <form onSubmit={handleSubmitBerita} className="space-y-4">
             <div>
@@ -1190,7 +1421,7 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Upload Foto Thumbnail Kegiatan</label>
+                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">Upload Foto Thumbnail Berita</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -1198,6 +1429,61 @@ export default function AdminDashboard() {
                   className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-slate-300 rounded-xl p-1 bg-white"
                 />
               </div>
+            </div>
+
+            {/* Video Support Section */}
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-xs font-bold uppercase text-slate-700">
+                  <Video className="w-4 h-4 text-red-600" />
+                  <span>Media Video Berita (Opsional)</span>
+                </label>
+                <span className="text-[11px] text-slate-500">Bisa upload file atau masukkan link YouTube</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Opsi 1: Upload File Video (.mp4, .webm)</label>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    onChange={(e) => setBeritaForm({ ...beritaForm, video: e.target.files[0], remove_video: false })}
+                    className="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 border border-slate-300 rounded-xl p-1 bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Opsi 2: Link Video YouTube / URL Eksternal</label>
+                  <input
+                    type="url"
+                    value={beritaForm.video_url}
+                    onChange={(e) => setBeritaForm({ ...beritaForm, video_url: e.target.value, remove_video: false })}
+                    placeholder="Contoh: https://www.youtube.com/watch?v=..."
+                    className="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Status Video Aktif / Info */}
+              {(beritaForm.current_video || beritaForm.video || beritaForm.video_url) && !beritaForm.remove_video && (
+                <div className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl text-xs">
+                  <div className="flex items-center gap-2 text-slate-700 truncate">
+                    <Film className="w-4 h-4 text-red-600 shrink-0" />
+                    <span className="truncate">
+                      {beritaForm.video ? `File baru dipilih: ${beritaForm.video.name}` :
+                       beritaForm.video_url ? `Tautan YouTube: ${beritaForm.video_url}` :
+                       `Video terpasang: ${beritaForm.current_video}`}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setBeritaForm({ ...beritaForm, video: null, video_url: '', remove_video: true })}
+                    className="text-[11px] font-semibold text-rose-600 hover:text-rose-800 shrink-0 ml-2"
+                  >
+                    Hapus Video
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>

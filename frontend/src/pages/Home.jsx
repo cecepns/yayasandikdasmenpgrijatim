@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Award, Shield, FileText, Database, ArrowRight, CheckCircle2,
-  Sparkles, BookOpen, Users, GraduationCap, Building2, MapPin, Calendar
+  Sparkles, BookOpen, Users, GraduationCap, Building2, MapPin, Calendar, Play
 } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -370,15 +370,26 @@ export default function Home() {
                   className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                 >
                   <div>
-                    {item.gambar && (
-                      <div className="w-full h-48 bg-slate-100 overflow-hidden">
+                    <div className="relative w-full h-48 bg-slate-100 overflow-hidden">
+                      {item.gambar ? (
                         <img
                           src={getImageUrl(item.gambar)}
                           alt={item.judul}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-300">
+                          <BookOpen className="w-12 h-12 opacity-40" />
+                        </div>
+                      )}
+
+                      {(item.video || item.video_url) && (
+                        <div className="absolute top-3 right-3 bg-red-600/90 text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md backdrop-blur-xs">
+                          <Play className="w-3 h-3 fill-white" />
+                          <span>Video</span>
+                        </div>
+                      )}
+                    </div>
                     <div className="p-6 space-y-3">
                       <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
                         <span className="px-3 py-1 bg-red-50 text-red-700 font-semibold rounded-full border border-red-100">
