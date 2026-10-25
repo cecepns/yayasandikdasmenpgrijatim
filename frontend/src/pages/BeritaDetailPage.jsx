@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, User, ArrowLeft, BookOpen, Share2, Tag, Video } from 'lucide-react';
+import { Calendar, User, ArrowLeft, Share2, Video } from 'lucide-react';
 import { api } from '../utils/api';
 import { API_ENDPOINTS } from '../utils/endpoints';
 import { requestHandler } from '../utils/request';
