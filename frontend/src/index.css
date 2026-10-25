@@ -28,9 +28,7 @@
 .article-content {
   width: 100%;
   max-width: 100%;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  overflow-wrap: anywhere;
+  text-align: left;
 }
 
 .article-content * {
@@ -41,16 +39,18 @@
 .article-content p,
 .article-content span,
 .article-content div,
-.article-content a,
 .article-content li {
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  text-align: left;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .article-content p {
   margin-bottom: 1.25rem;
   line-height: 1.8;
   color: #334155;
+  text-align: left;
 }
 
 .article-content p:last-child {
@@ -61,8 +61,8 @@
   color: #b91c1c;
   text-decoration: underline;
   text-underline-offset: 3px;
-  word-break: break-all;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: break-word;
   transition: color 0.15s ease-in-out;
 }
 
@@ -81,8 +81,9 @@
   line-height: 1.35;
   margin-top: 1.75rem;
   margin-bottom: 0.75rem;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  text-align: left;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .article-content h1 { font-size: 1.875rem; }
@@ -110,7 +111,7 @@
   max-width: 100%;
   white-space: pre-wrap !important;
   word-break: break-word !important;
-  overflow-wrap: anywhere !important;
+  overflow-wrap: break-word !important;
   background-color: #f8fafc;
   color: #1e293b;
   padding: 1rem;
@@ -126,7 +127,7 @@
 .article-content code {
   white-space: pre-wrap !important;
   word-break: break-word !important;
-  overflow-wrap: anywhere !important;
+  overflow-wrap: break-word !important;
   background-color: #f1f5f9;
   color: #0f172a;
   padding: 0.2rem 0.4rem;
@@ -139,17 +140,20 @@
   list-style-type: disc;
   margin-left: 1.5rem;
   margin-bottom: 1.25rem;
+  text-align: left;
 }
 
 .article-content ol {
   list-style-type: decimal;
   margin-left: 1.5rem;
   margin-bottom: 1.25rem;
+  text-align: left;
 }
 
 .article-content li {
   margin-bottom: 0.375rem;
   line-height: 1.7;
+  text-align: left;
 }
 
 .article-content blockquote {
@@ -160,6 +164,7 @@
   font-style: italic;
   background-color: #fef2f2;
   border-radius: 0 0.75rem 0.75rem 0;
+  text-align: left;
 }
 
 .article-content table {
@@ -177,8 +182,8 @@
   border: 1px solid #e2e8f0;
   padding: 0.625rem 0.875rem;
   text-align: left;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .article-content th {
@@ -197,7 +202,7 @@
 }
 
 .article-content .ql-align-justify {
-  text-align: justify;
+  text-align: left;
 }
 
 .article-content .ql-indent-1 {

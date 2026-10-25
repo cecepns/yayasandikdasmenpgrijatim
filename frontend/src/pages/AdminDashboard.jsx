@@ -341,7 +341,7 @@ export default function AdminDashboard() {
     const data = new FormData();
     data.append('judul', beritaForm.judul);
     data.append('kategori', beritaForm.kategori);
-    data.append('konten', beritaForm.konten);
+    data.append('konten', beritaForm.konten ? beritaForm.konten.replace(/&nbsp;/gi, ' ').replace(/\u00a0/g, ' ') : '');
     data.append('penulis', beritaForm.penulis || currentUser?.nama || 'Admin Dikdasmen PGRI');
     if (beritaForm.gambar) data.append('gambar', beritaForm.gambar);
     if (beritaForm.video) data.append('video', beritaForm.video);

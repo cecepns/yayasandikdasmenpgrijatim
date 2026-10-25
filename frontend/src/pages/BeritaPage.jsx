@@ -231,8 +231,12 @@ export default function BeritaPage() {
               </div>
 
               <div
-                className="article-content text-slate-700 text-sm leading-relaxed min-w-0 w-full break-words [overflow-wrap:anywhere]"
-                dangerouslySetInnerHTML={{ __html: selectedBerita.konten }}
+                className="article-content text-slate-700 text-sm leading-relaxed min-w-0 w-full text-left"
+                dangerouslySetInnerHTML={{
+                  __html: selectedBerita.konten
+                    ? selectedBerita.konten.replace(/&nbsp;/gi, ' ').replace(/\u00a0/g, ' ')
+                    : ''
+                }}
               />
             </div>
           )}

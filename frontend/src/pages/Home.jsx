@@ -405,7 +405,11 @@ export default function Home() {
                       </h3>
                       <div
                         className="text-slate-600 text-xs line-clamp-3 leading-relaxed break-words"
-                        dangerouslySetInnerHTML={{ __html: item.konten }}
+                        dangerouslySetInnerHTML={{
+                          __html: item.konten
+                            ? item.konten.replace(/&nbsp;/gi, ' ').replace(/\u00a0/g, ' ')
+                            : ''
+                        }}
                       />
                     </div>
                   </div>

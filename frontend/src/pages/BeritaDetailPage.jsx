@@ -51,14 +51,17 @@ export default function BeritaDetailPage() {
   // Helper to ensure both rich text HTML and plain text with linebreaks render cleanly
   const formattedContent = useMemo(() => {
     if (!berita?.konten) return '';
-    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(berita.konten);
+    // Normalize non-breaking spaces (&nbsp; and \u00a0) into standard spaces
+    // so words wrap naturally at whole-word boundaries without slicing words in half
+    const cleanContent = berita.konten.replace(/&nbsp;/gi, ' ').replace(/\u00a0/g, ' ');
+    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(cleanContent);
     if (!hasHtmlTags) {
-      return berita.konten
+      return cleanContent
         .split(/\r?\n\r?\n/)
         .map(paragraph => `<p>${paragraph.replace(/\r?\n/g, '<br />')}</p>`)
         .join('');
     }
-    return berita.konten;
+    return cleanContent;
   }, [berita?.konten]);
 
   if (loading) {
@@ -106,7 +109,7 @@ export default function BeritaDetailPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight break-words [overflow-wrap:anywhere]">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight break-words text-left">
             {berita.judul}
           </h1>
         </div>
@@ -164,7 +167,7 @@ export default function BeritaDetailPage() {
 
         {/* Content Body */}
         <div
-          className="article-content text-slate-700 leading-relaxed text-sm sm:text-base pt-6 border-t border-slate-100 min-w-0 w-full break-words [overflow-wrap:anywhere]"
+          className="article-content text-slate-700 leading-relaxed text-sm sm:text-base pt-6 border-t border-slate-100 min-w-0 w-full text-left"
           data-aos="fade-up"
           dangerouslySetInnerHTML={{ __html: formattedContent }}
         />
