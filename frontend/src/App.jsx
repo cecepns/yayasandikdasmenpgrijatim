@@ -42,9 +42,9 @@ export default function App() {
         <Route
           path="*"
           element={
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col min-h-screen overflow-x-hidden w-full">
               <Navbar />
-              <div className="flex-grow">
+              <div className="flex-grow w-full min-w-0">
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/sambutan" element={<SambutanPage />} />

@@ -138,12 +138,12 @@ export default function BeritaPage() {
                     </div>
                   </div>
 
-                  <h2 className="font-bold text-slate-900 text-lg leading-snug line-clamp-2 hover:text-red-700 transition-colors">
+                  <h2 className="font-bold text-slate-900 text-lg leading-snug line-clamp-2 hover:text-red-700 transition-colors break-words">
                     {item.judul}
                   </h2>
 
                   <div
-                    className="text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed"
+                    className="text-slate-600 text-xs sm:text-sm line-clamp-3 leading-relaxed break-words"
                     dangerouslySetInnerHTML={{ __html: item.konten }}
                   />
                 </div>
@@ -231,7 +231,7 @@ export default function BeritaPage() {
               </div>
 
               <div
-                className="text-slate-700 text-sm leading-relaxed prose max-w-none"
+                className="article-content text-slate-700 text-sm leading-relaxed min-w-0 w-full break-words [overflow-wrap:anywhere]"
                 dangerouslySetInnerHTML={{ __html: selectedBerita.konten }}
               />
             </div>

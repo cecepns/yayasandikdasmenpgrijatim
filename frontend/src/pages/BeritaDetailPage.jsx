@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, User, ArrowLeft, BookOpen, Share2, Tag, Video } from 'lucide-react';
 import { api } from '../utils/api';
@@ -30,6 +30,9 @@ export default function BeritaDetailPage() {
       navigate('/berita');
     } else {
       setBerita(data.data);
+      setTimeout(() => {
+        AOS.refresh();
+      }, 100);
     }
   };
 
@@ -45,6 +48,19 @@ export default function BeritaDetailPage() {
     }
   };
 
+  // Helper to ensure both rich text HTML and plain text with linebreaks render cleanly
+  const formattedContent = useMemo(() => {
+    if (!berita?.konten) return '';
+    const hasHtmlTags = /<[a-z][\s\S]*>/i.test(berita.konten);
+    if (!hasHtmlTags) {
+      return berita.konten
+        .split(/\r?\n\r?\n/)
+        .map(paragraph => `<p>${paragraph.replace(/\r?\n/g, '<br />')}</p>`)
+        .join('');
+    }
+    return berita.konten;
+  }, [berita?.konten]);
+
   if (loading) {
     return (
       <div className="bg-white py-20 text-center text-slate-500 font-medium">
@@ -58,8 +74,8 @@ export default function BeritaDetailPage() {
   const imageUrl = berita.gambar ? getImageUrl(berita.gambar) : null;
 
   return (
-    <div className="bg-white py-12 lg:py-16 text-slate-800">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="bg-white py-12 lg:py-16 text-slate-800 w-full overflow-x-hidden">
+      <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-8 min-w-0">
 
         {/* Back Link */}
         <div>
@@ -73,7 +89,7 @@ export default function BeritaDetailPage() {
         </div>
 
         {/* Article Header */}
-        <div className="space-y-4" data-aos="fade-up">
+        <div className="space-y-4 min-w-0 w-full" data-aos="fade-up">
           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
             <span className="px-3 py-1 bg-red-50 text-red-700 rounded-full border border-red-100 uppercase tracking-wider">
               {berita.kategori}
@@ -90,7 +106,7 @@ export default function BeritaDetailPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight break-words [overflow-wrap:anywhere]">
             {berita.judul}
           </h1>
         </div>
@@ -113,7 +129,7 @@ export default function BeritaDetailPage() {
           if (!hasVideo) return null;
 
           return (
-            <div className="space-y-3 pt-2" data-aos="fade-up">
+            <div className="space-y-3 pt-2 min-w-0 w-full" data-aos="fade-up">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
                 <div className="p-1.5 bg-red-50 text-red-700 rounded-lg">
                   <Video className="w-4 h-4" />
@@ -148,16 +164,16 @@ export default function BeritaDetailPage() {
 
         {/* Content Body */}
         <div
-          className="prose max-w-none text-slate-700 leading-relaxed text-sm sm:text-base space-y-4 pt-4 border-t border-slate-100"
+          className="article-content text-slate-700 leading-relaxed text-sm sm:text-base pt-6 border-t border-slate-100 min-w-0 w-full break-words [overflow-wrap:anywhere]"
           data-aos="fade-up"
-          dangerouslySetInnerHTML={{ __html: berita.konten }}
+          dangerouslySetInnerHTML={{ __html: formattedContent }}
         />
 
         {/* Footer Actions / Share */}
-        <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 min-w-0 w-full">
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-sm transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-sm transition-colors cursor-pointer"
           >
             <Share2 className="w-4 h-4 text-red-700" />
             <span>Bagikan Berita Ini</span>
@@ -176,3 +192,4 @@ export default function BeritaDetailPage() {
     </div>
   );
 }
+

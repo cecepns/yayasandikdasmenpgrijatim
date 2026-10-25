@@ -400,11 +400,11 @@ export default function Home() {
                           <span>{item.tanggal}</span>
                         </div>
                       </div>
-                      <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2 hover:text-red-700 transition-colors">
+                      <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2 hover:text-red-700 transition-colors break-words">
                         {item.judul}
                       </h3>
                       <div
-                        className="text-slate-600 text-xs line-clamp-3 leading-relaxed"
+                        className="text-slate-600 text-xs line-clamp-3 leading-relaxed break-words"
                         dangerouslySetInnerHTML={{ __html: item.konten }}
                       />
                     </div>
